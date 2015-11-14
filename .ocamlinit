@@ -3,3 +3,12 @@
 #thread
 #require "core.top"
 #require "core.syntax"
+
+#require "core";;
+#require "async";;
+
+#directory "_build";;
+#directory ".";;
+
+open Async.Std;;
+
