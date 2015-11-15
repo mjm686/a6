@@ -3,12 +3,14 @@
 #thread
 #require "core.top"
 #require "core.syntax"
+#require "csv.top"
 
 #require "core";;
 #require "async";;
+#require "csv;;"
 
 #directory "_build";;
 #directory ".";;
 
 open Async.Std;;
-
+open Csv;;
