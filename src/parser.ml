@@ -143,8 +143,11 @@ let print_single d =
     fprintf f "%a %a %s %s %s %f %f\n" Date0.pp d.date Time.Ofday.pp d.ofDay (cat_to_string d.category) (day_to_string d.dayOfWeek) d.pdDistrict d.x d.y in
   printf "Row %d %a" d.id format_helper d
 
+let float_helper s = 
+  if String.length s < 12 then String.length s
+  else 12
+
 let parse_single ?test:(test=false) id ls =
-  (*let id = int_of_string (List.hd ls) in*)
   let time = Time.of_string (List.hd ls) in
   let (date, of_day) = Time.to_date_ofday time (Time.Zone.local) in
   let cat = 
@@ -152,10 +155,15 @@ let parse_single ?test:(test=false) id ls =
     else parse_cat (List.nth ls 1) in
   let day_of_week = parse_day (List.nth ls 3) in
   let district = List.nth ls 4 in 
-  let x = float_of_string (String.sub (List.nth ls 7) 0 12) in
-  let y = float_of_string (String.sub (List.nth ls 8) 0 12) in
+  let x_s = List.nth ls 7 in
+  let y_s = List.nth ls 8 in
+  let x = try float_of_string (String.sub x_s 0 (float_helper x_s)) with
+     | Failure _  -> 0.0
+   in
+  let y = try float_of_string (String.sub y_s 0 (float_helper y_s)) with
+    | Failure _ -> 0.0
+   in
   let d =
-  {
     id = id;
     date = date;
     ofDay = of_day;
@@ -165,7 +173,6 @@ let parse_single ?test:(test=false) id ls =
     x = x;
     y = y 
   } in
-  let () = print_single d in
   d
 
 let parse_train fname = 
@@ -181,6 +188,5 @@ let parse_test fname =
 let print_all data = 
   List.iter print_single data
 
-let _ = parse_train "../data/train.csv"
-
+let _ = parse_train "train.csv"
 
