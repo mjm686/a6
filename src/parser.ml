@@ -3,8 +3,6 @@ open Csv
 open Printf
 open Core
 
-exception End_of_file
-
 type data = {
   id: int;
   date: Date0.t;
@@ -25,6 +23,8 @@ type data = {
  | SUICIDE | SUSPICIOUS | TREA | TRESPASS | VANDALISM | VEHICLE 
  | WARRANTS | WEAPON | UNDETERMINED | UNRECOGNIZED
 and day = | Mon | Tue | Wed | Thur | Fri | Sat | Sun | Unknown
+
+exception EOF of data list
 
 let load_file fname = 
   let ic = open_in fname in
@@ -183,10 +183,10 @@ let parse_single ?test:(test=false) id ls =
 let parse ic id test = 
   let counter = ref 0 in
   let rec helper (acc: data list) : data list =
-    if !counter = 20000 then acc
+    if !counter = 1000000 then acc
     else begin
       let next ic = try (Csv.next ic) with
-      | End_of_file -> Csv.close_in ic; raise End_of_file;
+      | End_of_file -> Csv.close_in ic; raise (EOF acc);
       | Csv.Failure (n1,n2,s) -> 
           printf "failed at field %d line %d because %s\n" n1 n2 s;
           Csv.next ic in
@@ -205,10 +205,9 @@ let parse_train ic id = parse ic id false
 let print_all data = 
   List.iter print_single data
 
-let ic = load_file "train.csv" in
+let ic = load_file "../data/train.csv" in
 let id = ref 0 in
-let (data1,_,ic) = parse_train ic id in
-let (data2,_,ic) = parse_train ic id in
-print_all data1;
-print_all data2;
+let (d, _, _) = try parse_train ic id with 
+| EOF d -> (d, 0, ic) in
+printf "%d\n" (List.length d);
 
