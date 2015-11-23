@@ -3,6 +3,8 @@ open Csv
 open Printf
 open Core
 
+exception End_of_file
+
 type data = {
   id: int;
   date: Date0.t;
@@ -25,7 +27,10 @@ type data = {
 and day = | Mon | Tue | Wed | Thur | Fri | Sat | Sun | Unknown
 
 let load_file fname = 
-  Csv.load fname
+  let ic = open_in fname in
+  let ic = Csv.of_channel ic in
+  let _ = Csv.next ic in
+  ic
 
 let parse_cat s = 
   match s with 
@@ -163,7 +168,7 @@ let parse_single ?test:(test=false) id ls =
   let y = try float_of_string (String.sub y_s 0 (float_helper y_s)) with
     | Failure _ -> 0.0
    in
-  let d =
+  let d = {
     id = id;
     date = date;
     ofDay = of_day;
@@ -175,18 +180,35 @@ let parse_single ?test:(test=false) id ls =
   } in
   d
 
-let parse_train fname = 
-  let csv = load_file fname in
+let parse ic id test = 
   let counter = ref 0 in
-  List.map (fun i -> counter:= !counter + 1; parse_single !counter i) (List.tl csv)
+  let rec helper (acc: data list) : data list =
+    if !counter = 20000 then acc
+    else begin
+      let next ic = try (Csv.next ic) with
+      | End_of_file -> Csv.close_in ic; raise End_of_file;
+      | Csv.Failure (n1,n2,s) -> 
+          printf "failed at field %d line %d because %s\n" n1 n2 s;
+          Csv.next ic in
+      counter := !counter + 1; 
+      id := !id + 1;
+      let d = next ic in
+      helper ((parse_single !id d ~test:test)::acc)
+    end
+  in let data = helper [] in
+  (data, !counter, ic)
 
-let parse_test fname = 
-  let csv = load_file fname in
-  let counter = ref 0 in
-  List.map (fun i -> counter:= !counter + 1; parse_single !counter i ~test:true) (List.tl csv)
+let parse_test ic id = parse ic id true
+
+let parse_train ic id = parse ic id false
 
 let print_all data = 
   List.iter print_single data
 
-let _ = parse_train "train.csv"
+let ic = load_file "train.csv" in
+let id = ref 0 in
+let (data1,_,ic) = parse_train ic id in
+let (data2,_,ic) = parse_train ic id in
+print_all data1;
+print_all data2;
 
