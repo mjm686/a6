@@ -180,34 +180,36 @@ let parse_single ?test:(test=false) id ls =
   } in
   d
 
-let parse ic id test = 
-  let counter = ref 0 in
+let parse ic test = 
+  let id = ref 0 in
   let rec helper (acc: data list) : data list =
-    if !counter = 1000000 then acc
-    else begin
-      let next ic = try (Csv.next ic) with
+    let next ic = try (Csv.next ic) with
       | End_of_file -> Csv.close_in ic; raise (EOF acc);
       | Csv.Failure (n1,n2,s) -> 
           printf "failed at field %d line %d because %s\n" n1 n2 s;
           Csv.next ic in
-      counter := !counter + 1; 
-      id := !id + 1;
-      let d = next ic in
-      helper ((parse_single !id d ~test:test)::acc)
-    end
+    id := !id + 1;
+    let d = next ic in
+    helper ((parse_single !id d ~test:test)::acc)
   in let data = helper [] in
-  (data, !counter, ic)
+  data
 
-let parse_test ic id = parse ic id true
+let parse_test ic = parse ic true
 
-let parse_train ic id = parse ic id false
+let parse_train ic = parse ic false
 
 let print_all data = 
   List.iter print_single data
 
+let write_to fname csv = 
+  let oc = open_out fname in
+  let oc = Csv.to_channel oc in
+  Csv.output_all oc csv
+
 let ic = load_file "../data/train.csv" in
-let id = ref 0 in
-let (d, _, _) = try parse_train ic id with 
-| EOF d -> (d, 0, ic) in
+let d = try parse_train ic with 
+| EOF d -> d in
 printf "%d\n" (List.length d);
 
+let csv = Csv.load "../data/train.csv" in
+write_to "test.csv" csv
