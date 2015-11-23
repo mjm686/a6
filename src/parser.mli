@@ -2,6 +2,7 @@ open Core
 open Csv
 
 type data 
+type output
 
 (** [load_file f] opens the file f in stdin and returns an Csv.in_channel
  *  that will later be used in parse_train and parse_test.
@@ -27,4 +28,4 @@ val parse_test : Csv.in_channel ->  data list
  *
  * [write_to fname csv] writes [csv] records into file [fname]
  *)
-val write_to: string -> Csv.t -> unit
+val write_to: string -> output list -> unit

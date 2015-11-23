@@ -24,11 +24,15 @@ type data = {
  | WARRANTS | WEAPON | UNDETERMINED | UNRECOGNIZED
 and day = | Mon | Tue | Wed | Thur | Fri | Sat | Sun | Unknown
 
+type output = float list
+
 exception EOF of data list
+exception InvalidInput of output 
 
 let load_file fname = 
   let ic = open_in fname in
   let ic = Csv.of_channel ic in
+  (* To skip over the first line, which is the field names *)
   let _ = Csv.next ic in
   ic
 
@@ -185,7 +189,8 @@ let parse ic test =
   let rec helper (acc: data list) : data list =
     let next ic = try (Csv.next ic) with
       | End_of_file -> Csv.close_in ic; raise (EOF acc);
-      | Csv.Failure (n1,n2,s) -> 
+      | Csv.Failure (n1,n2,s) ->
+         (* if any record fails to be in csv format, skip *) 
           printf "failed at field %d line %d because %s\n" n1 n2 s;
           Csv.next ic in
     id := !id + 1;
@@ -194,14 +199,28 @@ let parse ic test =
   in let data = helper [] in
   data
 
+let print_all data = 
+  List.iter print_single data
+
+(* Functions in mli implemented *)
 let parse_test ic = parse ic true
 
 let parse_train ic = parse ic false
 
-let print_all data = 
-  List.iter print_single data
+let rec stringify csv = 
+  match csv with
+  | [] -> []
+  | h::t -> begin
+    let s_h = 
+      match h with
+      | [] -> raise (InvalidInput h)
+      | h1::t1 -> (string_of_int (int_of_float h1))::
+        (List.map (fun f -> string_of_float f) t1) in
+    s_h::(stringify t)
+  end
 
 let write_to fname csv = 
+  let csv = stringify csv in
   let oc = open_out fname in
   let oc = Csv.to_channel oc in
   Csv.output_all oc csv
@@ -210,6 +229,3 @@ let ic = load_file "../data/train.csv" in
 let d = try parse_train ic with 
 | EOF d -> d in
 printf "%d\n" (List.length d);
-
-let csv = Csv.load "../data/train.csv" in
-write_to "test.csv" csv
