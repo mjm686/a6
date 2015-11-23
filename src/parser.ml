@@ -184,11 +184,19 @@ let parse_single ?test:(test=false) id ls =
   } in
   d
 
+let compare_data d1 d2 =
+  let d1 = cat_to_string d1.category in
+  let d2 = cat_to_string d2.category in
+  String.compare d1 d2
+
 let parse ic test = 
   let id = ref 0 in
   let rec helper (acc: data list) : data list =
     let next ic = try (Csv.next ic) with
-      | End_of_file -> Csv.close_in ic; raise (EOF acc);
+      | End_of_file -> 
+          Csv.close_in ic; 
+          let acc = List.sort compare_data acc in
+          raise (EOF acc);
       | Csv.Failure (n1,n2,s) ->
          (* if any record fails to be in csv format, skip *) 
           printf "failed at field %d line %d because %s\n" n1 n2 s;
@@ -197,7 +205,7 @@ let parse ic test =
     let d = next ic in
     helper ((parse_single !id d ~test:test)::acc)
   in let data = helper [] in
-  data
+  List.sort compare_data data
 
 let print_all data = 
   List.iter print_single data
@@ -229,3 +237,4 @@ let ic = load_file "../data/train.csv" in
 let d = try parse_train ic with 
 | EOF d -> d in
 printf "%d\n" (List.length d);
+print_all d;
