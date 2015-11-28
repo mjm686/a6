@@ -11,8 +11,20 @@ and day = Mon | Tue | Wed | Thu | Fri | Sat | Sun | Unk
 type tree =
 	| Leaf of leaf
 	| Node of node
-and node = {t:tree list; a:attr}
-and leaf = {c:cat; mutable i:int}
+and node = {t : tree list; a : attr}
+and leaf = {c : cat; mutable i : int}
+and cat =
+  | ARSON | ASSAULT | BADCHECKS | BRIBERY
+  | BURGLARY | DISORDERLY | DRIVING | DRUG
+  | DRUNK | EMBEZZLE | EXTORTION | FAMILY
+  | FORGERY | FRAUD | GAMBLING | KIDNAPPING
+  | LARCENY | LIQUOR | LOITER | MISSING
+  | NONCRIMINAL | OTHER | PORN | PROSTITUTION
+  | RECOVERED | ROBBERY | RUNAWAY | SECONDARY
+  | SEXOFFENSESF | SEXOFFENSESNF | STOLEN
+  | SUICIDE | SUSPICIOUS | TREA | TRESPASS
+  | VANDALISM | VEHICLE | WARRANTS | WEAPON
+  | UNDETERMINED | UNRECOGNIZED
 
 (**
  * [makeLeaves l] returns a list of Leafs.
@@ -29,7 +41,8 @@ val makeLeaves : cat list -> tree list
  * [makeLeaves cl] listed in Node.t and one value of
  * fl is stored in each Node.
  *)
-val makeNodes1 : float list -> cat list -> tree list
+val makeNodes1 : float list -> cat list
+-> tree list
 
 (**
  * [makeNodes2 fl1 fl2 cl] returns a list of Nodes.
@@ -58,8 +71,11 @@ float list -> cat list -> tree list
  * Every Node in the list has every Node from
  * [makeNodes3 il fl1 fl2 cl] listed in Node.t and
  * one value of dl is stored in each Node.
+ *
+ * The previous makeNodes functions are meant
+ * only to be helper functions for [makeNodes].
  *)
-val makeNodes : day list -> int list ->
+val makeNodes : date list -> int list ->
 float list -> float list -> cat list -> tree list
 
 (**
@@ -77,12 +93,130 @@ float list -> float list -> cat list -> tree list
 val hollowForest : unit -> tree list
 
 (**
- * [randomForest datl] creates a list of trees from data
- * list datl.
+ * [leafBool categ t] returns a boolean.
  *
- * Each leaf node is initially set up such that each
- * i = 0; the data in datl is then used to update each
- * i based on how many times a certain crime type
- * occurred at a specific location and time.
+ * leafBool returns true if categ is equivalent to the
+ * category stored in Leaf t; if t is a Node, leafBool
+ * returns false.
  *)
-val randomForest : data list -> tree list
+val leafBool : cat -> tree -> boolean
+
+(**
+ * [nodeBool att t] returns a boolean.
+ *
+ * nodeBool returns true if att is equivalent to the
+ * attribute stored in Node t; if t is a Leaf,
+ * nodeBool returns false.
+ *)
+val nodeBool : attr -> tree -> boolean
+
+(**
+ * [nodeListGet n] returns a tree list.
+ *
+ * nodeListGet returns the tree list stored in
+ * Node n (n.t); if n is a Leaf,
+ * nodeListGet returns an empty list.
+ *)
+val nodeListGet : tree -> tree list
+
+(**
+ * [editLeaf lf] increments the i value of a
+ * Leaf lf by 1; if lf is a Node, editLeaf
+ * does nothing.
+ *)
+val editLeaf : tree -> unit
+
+(**
+ * [editTree1 categ tl] increments the i value of
+ * a Leaf in a tree list by one.
+ *
+ * The i value changed is the value stored in the
+ * Leaf corresponding to category categ.
+ *)
+val editTree1 : cat -> tree list -> unit
+
+(**
+ * [editTree2 aY categ tl] increments the i value of
+ * a Leaf in a tree list by one.
+ *
+ * The i value changed is the value stored in the
+ * Leaf corresponding to category categ, whose
+ * parent node contains attribute aY; this Node
+ * containing aY must be in list tl.
+ *)
+val editTree2 : attr -> cat -> tree list -> unit
+
+(**
+ * [editTree3 aX aY categ tl] increments the i
+ * value of a Leaf in a tree list by one.
+ *
+ * The i value changed is the value stored in the
+ * Leaf corresponding to category categ, whose
+ * parent node contains attribute aY, whose
+ * parent node contains attribute aX; this Node
+ * containing aX must be in list tl.
+ *)
+val editTree3 : attr -> attr -> cat -> tree list
+-> unit
+
+(**
+ * [editTree4 aTime aX aY categ tl] increments the
+ * i value of a Leaf in a tree list by one.
+ *
+ * The i value changed is the value stored in the
+ * Leaf corresponding to category categ, whose
+ * parent node contains attribute aY, whose
+ * parent node contains attribute aX, whose
+ * parent node contains attribute aTime; this Node
+ * containing aTime must be in list tl.
+ *)
+val editTree4 : attr -> attr -> attr -> cat
+-> tree list -> unit
+
+(**
+ * [editTree aDay aTime aX aY categ tl] increments
+ * the i value of a Leaf in a random forest by one.
+ *
+ * The i value changed is the value stored in the
+ * Leaf corresponding to category categ whose
+ * parent node contains attribute aY, whose
+ * parent node contains attribute aX, whose
+ * parent node conatins attribute aTime, whose
+ * parent node contains attribute aDay; this Node
+ * containing aDay must be in list tl.
+ *
+ * This function is the basis for editing
+ * trees in the random forest based on training
+ * data. The other editTree functions are helpers
+ * for [editTree].
+ *)
+val editTree : attr -> attr -> attr -> attr
+-> cat -> tree list -> unit
+
+(**
+ * [dayToDate d] creates a Date attribute from a
+ * Parser.day data type.
+ *)
+val dayToDate : Parser.day -> attr
+
+(**
+ * [ofDayToTime ti] creates a Time attribute from a
+ * Core.Time.Ofday.t data type.
+ *)
+val ofDayToTime : Core.Time.Ofday.t -> attr
+
+(**
+ * [updateTree dat tl] edits a Leaf, as in [editTree],
+ * based on the information stored in data.
+ *)
+val updateTree : Parser.data -> tree list -> unit
+
+(**
+ * [randomForest datl tl] fills a random forest tl
+ * with data from datl.
+ *
+ * tl should be a blank random forest (created via
+ *[hollowForest ()]); this forest will then be updated
+ * to account for the data in datl.
+ *)
+val randomForest : data list -> tree list -> unit
