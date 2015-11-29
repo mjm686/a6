@@ -48,7 +48,3 @@ val trainingTree : bytes -> tree
  * predictions and output a list of predicted crime types.
  *)
 val predictions : bytes -> tree -> bytes
-
-(**
- * As in Dtree, any suggestions are appreciated.
- *)
