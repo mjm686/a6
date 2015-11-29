@@ -2,7 +2,7 @@ open Core
 open Parser 
 
 type attr = 
-	| Date | Day | District | X | Y
+	| Date | Day | X | Y
 
 type val = 
 	| Float of float
