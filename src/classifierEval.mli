@@ -1,9 +1,5 @@
-open CrossValid
-open ExpGradient
 open Parser
-open KNN
-open DecisionTree
-open Bayes
+open ExpGradient
 
 (** [eval] runs 4-fold cross validation with the EG algorithm to give weights
  *  to all three algorithms based on their performances, and then each 

@@ -3,6 +3,9 @@ open Csv
 
 type data 
 type output
+type cat
+
+exception EOF of data list
 
 (** [load_file f] opens the file f in stdin and returns an Csv.in_channel
  *  that will later be used in parse_train and parse_test.

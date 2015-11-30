@@ -3,16 +3,7 @@ open Csv
 open Printf
 open Core
 
-type data = {
-  id: int;
-  date: Date0.t;
-  ofDay: Time.Ofday.t;
-  category: cat;
-  dayOfWeek: day;
-  pdDistrict: string;
-  x: float;
-  y: float 
-} and cat = 
+type cat = 
    | ARSON | ASSAULT | BADCHECKS | BRIBERY | BURGLARY | DISORDERLY 
    | DRIVING | DRUG | DRUNK | EMBEZZLE
  | EXTORTION | FAMILY | FORGERY | FRAUD | GAMBLING 
@@ -22,7 +13,17 @@ type data = {
  | SEXOFFENSESF | SEXOFFENSESNF | STOLEN
  | SUICIDE | SUSPICIOUS | TREA | TRESPASS | VANDALISM | VEHICLE 
  | WARRANTS | WEAPON | UNDETERMINED | UNRECOGNIZED
-and day = | Mon | Tue | Wed | Thur | Fri | Sat | Sun | Unknown
+
+type data = {
+  id: int;
+  date: Date0.t;
+  ofDay: Time.Ofday.t;
+  category: cat;
+  dayOfWeek: day;
+  pdDistrict: string;
+  x: float;
+  y: float 
+} and day = | Mon | Tue | Wed | Thur | Fri | Sat | Sun | Unknown
 
 type output = float list
 
@@ -184,6 +185,26 @@ let parse_single ?test:(test=false) id ls =
   } in
   d
 
+let parse_fold_single id ls = 
+  let date = Date0.of_string_iso8601_basic (List.hd ls) 0 in
+  let of_day = Time.Ofday.of_string (List.nth ls 1) in
+  let cat = parse_cat (List.nth ls 2) in
+  let day_of_week = parse_day (List.nth ls 3) in
+  let district = List.nth ls 4 in 
+  let x = float_of_string (List.nth ls 5) in
+  let y = float_of_string (List.nth ls 6) in
+  let d = {
+    id = id;
+    date = date;
+    ofDay = of_day;
+    category = cat;
+    dayOfWeek = day_of_week;
+    pdDistrict = district;
+    x = x;
+    y = y 
+  } in
+  d
+
 let compare_data d1 d2 =
   let d1 = cat_to_string d1.category in
   let d2 = cat_to_string d2.category in
@@ -234,7 +255,7 @@ let write_to fname csv =
   Csv.output_all oc csv
 
 let data_to_string (d: data) : string list = 
-  let date = Date0.to_string_american d.date in
+  let date = Date0.to_string_iso8601_basic d.date in
   let ofDay = Time.Ofday.to_string d.ofDay in
   let category = cat_to_string d.category in
   let day = day_to_string d.dayOfWeek in
@@ -242,8 +263,4 @@ let data_to_string (d: data) : string list =
   let y = string_of_float d.y in
   [date;ofDay;category;day;d.pdDistrict;x;y]
 
-let ic = load_file "../data/train.csv" in
-let d = try parse_train ic with 
-| EOF d -> d in
-printf "%d\n" (List.length d);
-print_all d;
+
