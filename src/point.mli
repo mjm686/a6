@@ -30,12 +30,28 @@ val distance  : point -> point -> float
 (**
  * [points_within k p ps] returns a list of points within the given distance.
  *
- * For point p within a field of points ps, returns a list of points that fall
+ * For point p within a field of points ps, returns the points that fall
  * within the given distance.
  *)
-val points_within  : int -> point -> points -> point list
+val points_within  : float -> point -> points -> points
 
 (**
  * [classification p] returns the category classification of the given point.
  *)
 val classification : point -> cat
+
+(**
+ * tbd
+ *)
+val tally_cats : points -> (cat * int) list
+
+(**
+ * tbd
+ *)
+val get_category : int -> cat
+
+(**
+ * [num_of_class ps cat] returns the number of points of the given category
+ * cat within the provided points ps.
+ *)
+val num_of_class : points -> cat -> int

@@ -1,11 +1,21 @@
 open Parser
 open Point
 
+let points_data = ref points
+let points_cat_tally = ref points
+let num_points = ref int
+
+
 (**
  * [train l] takes in training data and outputs the collection of points that
  * result.
  *)
-val train  : data list -> points
+let train  =
+  let x = Point.create_points l in
+  let _ = points_data := x in
+  (points_cat_tally := Point.tally_cats x);
+  (num_points := List.length l);
+  x
 
 (**
  * [prior_probability cat] returns the prior probability of any point being
@@ -14,7 +24,10 @@ val train  : data list -> points
  *
  * The proabilitiy is a float from 0.0 to 1.0 inclusive.
  *)
-val prior_probability  : int -> float
+let prior_probability cat =
+  let n = float_of_int (List.assoc cat !points_cat_tally)
+  let d = float_of_int !num_points in
+  n /. d
 
 (**
  * [likelihood p cat] returns the likelihood of having point p given category
@@ -22,7 +35,7 @@ val prior_probability  : int -> float
  *
  * The proabilitiy is a float from 0.0 to 1.0 inclusive.
  *)
-val likelihood  : point -> int -> float
+let likelihood p cat =
 
 (**
  * [posterior_probability p cat] returns the posterior probability of
@@ -31,18 +44,22 @@ val likelihood  : point -> int -> float
  *
  * The proabilitiy is a float from 0.0 to 1.0 inclusive.
  *)
-val posterior_probability  : point -> int -> float
+let posterior_probability p cat =
+  (prior_probability cat) *. (likelihood p cat)
 
 (**
  * [classify p ps] classifies a point according to training points ps.
  *
  * It returns a new point of the predicted category.
  *)
-val classify  : point -> points -> point
+let classify =
 
 (**
  * [predict d] predicts the classification of the given d under the training
  * points, and then returns the predicted category.
  *
  *)
-val predict  : data -> points -> cat
+let predict d =
+  let p = Point.create_point d
+  let ps = !points_data in
+  classify p ps
