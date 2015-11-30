@@ -210,9 +210,13 @@ let compare_data d1 d2 =
   let d2 = cat_to_string d2.category in
   String.compare d1 d2
 
-let parse ic test = 
+let counter = ref 0
+
+(*let parse ic test = 
   let id = ref 0 in
   let rec helper (acc: data list) : data list =
+    if !counter > 870000 then (List.sort compare_data acc) 
+    else
     let next ic = try (Csv.next ic) with
       | End_of_file -> 
           Csv.close_in ic; 
@@ -223,8 +227,33 @@ let parse ic test =
           printf "failed at field %d line %d because %s\n" n1 n2 s;
           Csv.next ic in
     id := !id + 1;
+    counter := !counter + 1;
     let d = next ic in
     helper ((parse_single !id d ~test:test)::acc)
+  in let data = helper [] in
+  List.sort compare_data data*)
+
+let parse ic test = 
+  let id = ref 0 in
+  let rec helper (acc: data list) : data list =
+    if !counter >= 100000 then 
+      let _ = counter := 0 in
+      (List.sort compare_data acc) 
+    else begin
+      let next ic = try (Csv.next ic) with
+        | End_of_file -> 
+            Csv.close_in ic; 
+            let acc = List.sort compare_data acc in
+            raise (EOF acc);
+        | Csv.Failure (n1,n2,s) ->
+           (* if any record fails to be in csv format, skip *) 
+            printf "failed at field %d line %d because %s\n" n1 n2 s;
+            Csv.next ic in
+      id := !id + 1;
+      counter := !counter + 1;
+      let d = next ic in
+      helper ((parse_single !id d ~test:test)::acc)
+    end
   in let data = helper [] in
   List.sort compare_data data
 
