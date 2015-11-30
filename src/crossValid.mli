@@ -4,10 +4,10 @@ open Parser
  * cross validation*)
 type set
 
-(** [shuffle] shuffles the training data into four different sets of training
+(** [shuffle] shuffles the training data into k different sets of training
  * and testing data for cross validation with the test set being a different
  * partition for each set
  *
- * [shuffle d] returns a list of size 4 containing 4 sets
+ * [shuffle d k] writes out k pairs of training and testing datasets.
  * *)
-val shuffle: data list -> int -> set list
+val shuffle: data list -> int -> unit

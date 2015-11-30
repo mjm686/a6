@@ -3,7 +3,7 @@ open KNN
 open Parser
 open ClassifierEval
 
-type fname = string
+type fname
 
 (** [main] is the main method of the project. It loads training data from
  * [first fname] and testing data from [second fname] and writes the results

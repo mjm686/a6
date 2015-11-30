@@ -29,3 +29,5 @@ val parse_test : Csv.in_channel ->  data list
  * [write_to fname csv] writes [csv] records into file [fname]
  *)
 val write_to: string -> output list -> unit
+
+val data_to_string : data -> string list

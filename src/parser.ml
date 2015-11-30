@@ -210,11 +210,6 @@ let parse ic test =
 let print_all data = 
   List.iter print_single data
 
-(* Functions in mli implemented *)
-let parse_test ic = parse ic true
-
-let parse_train ic = parse ic false
-
 let rec stringify csv = 
   match csv with
   | [] -> []
@@ -227,11 +222,25 @@ let rec stringify csv =
     s_h::(stringify t)
   end
 
+(* Functions in mli implemented *)
+let parse_test ic = parse ic true
+
+let parse_train ic = parse ic false
+
 let write_to fname csv = 
   let csv = stringify csv in
   let oc = open_out fname in
   let oc = Csv.to_channel oc in
   Csv.output_all oc csv
+
+let data_to_string (d: data) : string list = 
+  let date = Date0.to_string_american d.date in
+  let ofDay = Time.Ofday.to_string d.ofDay in
+  let category = cat_to_string d.category in
+  let day = day_to_string d.dayOfWeek in
+  let x = string_of_float d.x in
+  let y = string_of_float d.y in
+  [date;ofDay;category;day;d.pdDistrict;x;y]
 
 let ic = load_file "../data/train.csv" in
 let d = try parse_train ic with 
