@@ -284,12 +284,13 @@ let write_to fname csv =
   Csv.output_all oc csv
 
 let data_to_string (d: data) : string list = 
+  let id = string_of_int d.id in
   let date = Date0.to_string_iso8601_basic d.date in
   let ofDay = Time.Ofday.to_string d.ofDay in
   let category = cat_to_string d.category in
   let day = day_to_string d.dayOfWeek in
   let x = string_of_float d.x in
   let y = string_of_float d.y in
-  [date;ofDay;category;day;d.pdDistrict;x;y]
+  [id;date;ofDay;category;day;d.pdDistrict;x;y]
 
 
