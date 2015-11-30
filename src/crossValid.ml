@@ -27,6 +27,7 @@ let write_to set k =
   let train = set.train in
   let train = List.map (fun i -> Parser.data_to_string i) train in
   let test = List.map (fun i -> Parser.data_to_string i) test in
+  let open_out = open_out_gen [Open_rdonly;Open_wronly;Open_creat;Open_append] 0o666 in
   let oc_test = Csv.to_channel (open_out test_fname) in
   let oc_train = Csv.to_channel (open_out train_fname) in
   List.iter (fun i -> Csv.output_record oc_test i) test;
@@ -54,8 +55,7 @@ let shuffle dl k =
   let len = float_of_int (List.length dl) in
   let test_size = int_of_float (floor (len /. k)) in
   let dl = randomize dl in
-  write_all_sets dl test_size;
-  ()
+  write_all_sets dl test_size
 
 
   

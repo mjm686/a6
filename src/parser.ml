@@ -185,14 +185,15 @@ let parse_single ?test:(test=false) id ls =
   } in
   d
 
-let parse_fold_single id ls = 
-  let date = Date0.of_string_iso8601_basic (List.hd ls) 0 in
-  let of_day = Time.Ofday.of_string (List.nth ls 1) in
-  let cat = parse_cat (List.nth ls 2) in
-  let day_of_week = parse_day (List.nth ls 3) in
-  let district = List.nth ls 4 in 
-  let x = float_of_string (List.nth ls 5) in
-  let y = float_of_string (List.nth ls 6) in
+let parse_fold_single ls =
+  let id = int_of_string (List.hd ls) in
+  let date = Date0.of_string_iso8601_basic (List.nth ls 1) 0 in
+  let of_day = Time.Ofday.of_string (List.nth ls 2) in
+  let cat = parse_cat (List.nth ls 3) in
+  let day_of_week = parse_day (List.nth ls 4) in
+  let district = List.nth ls 5 in 
+  let x = float_of_string (List.nth ls 6) in
+  let y = float_of_string (List.nth ls 7) in
   let d = {
     id = id;
     date = date;
@@ -233,8 +234,8 @@ let counter = ref 0
   in let data = helper [] in
   List.sort compare_data data*)
 
+let id = ref 0
 let parse ic test = 
-  let id = ref 0 in
   let rec helper (acc: data list) : data list =
     if !counter >= 100000 then 
       let _ = counter := 0 in
@@ -253,6 +254,28 @@ let parse ic test =
       counter := !counter + 1;
       let d = next ic in
       helper ((parse_single !id d ~test:test)::acc)
+    end
+  in let data = helper [] in
+  List.sort compare_data data
+
+let parse_fold ic = 
+  let rec helper (acc: data list) : data list =
+    if !counter >= 100000 then 
+      let _ = counter := 0 in
+      (List.sort compare_data acc) 
+    else begin
+      let next ic = try (Csv.next ic) with
+        | End_of_file -> 
+            Csv.close_in ic; 
+            let acc = List.sort compare_data acc in
+            raise (EOF acc);
+        | Csv.Failure (n1,n2,s) ->
+           (* if any record fails to be in csv format, skip *) 
+            printf "failed at field %d line %d because %s\n" n1 n2 s;
+            Csv.next ic in
+      counter := !counter + 1;
+      let d = next ic in
+      helper ((parse_fold_single d)::acc)
     end
   in let data = helper [] in
   List.sort compare_data data
