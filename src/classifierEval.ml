@@ -2,6 +2,7 @@ open CrossValid
 open Parser
 
 exception End
+exception EndWithData
 
 let cross_valid () = 
   let ic = load_file "../data/train.csv" in
@@ -12,7 +13,10 @@ let cross_valid () =
     shuffle d 4;
     try helper ic with 
     | End -> () in
-  helper ic in
-cross_valid ()
+  helper ic 
+
+let ic = load_file "test_fold4.csv" in
+let dl = parse_train ic in
+Printf.printf "total %d\n" (List.length dl)
 
 let eval dl = failwith "TODO"

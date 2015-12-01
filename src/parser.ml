@@ -27,6 +27,7 @@ type data = {
 
 type output = float list
 
+exception BadData
 exception EOF of data list
 exception InvalidInput of output 
 
@@ -192,8 +193,10 @@ let parse_fold_single ls =
   let cat = parse_cat (List.nth ls 3) in
   let day_of_week = parse_day (List.nth ls 4) in
   let district = List.nth ls 5 in 
-  let x = float_of_string (List.nth ls 6) in
-  let y = float_of_string (List.nth ls 7) in
+  let x = try float_of_string (List.nth ls 6) with
+    | Failure _ -> raise BadData in
+  let y = try float_of_string (List.nth ls 7) with
+    | Failure _ -> raise BadData in
   let d = {
     id = id;
     date = date;
@@ -204,14 +207,14 @@ let parse_fold_single ls =
     x = x;
     y = y 
   } in
-  d
+  let _ = printf "%d\n" d.id in
+  Some d
 
 let compare_data d1 d2 =
   let d1 = cat_to_string d1.category in
   let d2 = cat_to_string d2.category in
   String.compare d1 d2
 
-let counter = ref 0
 
 (*let parse ic test = 
   let id = ref 0 in
@@ -233,7 +236,7 @@ let counter = ref 0
     helper ((parse_single !id d ~test:test)::acc)
   in let data = helper [] in
   List.sort compare_data data*)
-
+let counter = ref 0
 let id = ref 0
 let parse ic test = 
   let rec helper (acc: data list) : data list =
@@ -241,7 +244,7 @@ let parse ic test =
       let _ = counter := 0 in
       (List.sort compare_data acc) 
     else begin
-      let next ic = try (Csv.next ic) with
+      let next_ic = try (Csv.next ic) with
         | End_of_file -> 
             Csv.close_in ic; 
             let acc = List.sort compare_data acc in
@@ -252,32 +255,33 @@ let parse ic test =
             Csv.next ic in
       id := !id + 1;
       counter := !counter + 1;
-      let d = next ic in
+      let d = next_ic in
       helper ((parse_single !id d ~test:test)::acc)
     end
   in let data = helper [] in
   List.sort compare_data data
 
+let get_next ic acc = 
+  try (Csv.next ic) with
+    | End_of_file -> 
+        Csv.close_in ic; 
+        let acc = List.sort compare_data acc in
+        raise (EOF acc);
+    | Csv.Failure (n1,n2,s) ->
+       (* if any record fails to be in csv format, skip *) 
+        printf "failed at field %d line %d because %s\n" n1 n2 s;
+        Csv.next ic
+
 let parse_fold ic = 
   let rec helper (acc: data list) : data list =
-    if !counter >= 100000 then 
-      let _ = counter := 0 in
-      (List.sort compare_data acc) 
-    else begin
-      let next ic = try (Csv.next ic) with
-        | End_of_file -> 
-            Csv.close_in ic; 
-            let acc = List.sort compare_data acc in
-            raise (EOF acc);
-        | Csv.Failure (n1,n2,s) ->
-           (* if any record fails to be in csv format, skip *) 
-            printf "failed at field %d line %d because %s\n" n1 n2 s;
-            Csv.next ic in
-      counter := !counter + 1;
-      let d = next ic in
-      helper ((parse_fold_single d)::acc)
-    end
-  in let data = helper [] in
+      let d = try get_next ic acc with
+        | EOF acc -> raise (EOF acc) in
+      let d = try parse_fold_single d with
+        | BadData -> None in
+      match d with 
+        | None -> helper acc
+        | Some d -> helper (d::acc) in
+  let data = helper [] in
   List.sort compare_data data
 
 let print_all data = 
@@ -298,7 +302,7 @@ let rec stringify csv =
 (* Functions in mli implemented *)
 let parse_test ic = parse ic true
 
-let parse_train ic = parse ic false
+let parse_train ic = parse_fold ic
 
 let write_to fname csv = 
   let csv = stringify csv in
