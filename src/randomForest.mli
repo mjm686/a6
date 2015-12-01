@@ -143,4 +143,4 @@ val predictions : data list -> tree list ->
  * on the data list dl2 (the "testing data").
  *)
 val finale : data list -> data list ->
-(cat*float) list list
+(int * (cat*float) list) list
