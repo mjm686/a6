@@ -184,7 +184,19 @@ val editTree : attr -> attr -> attr -> attr
  * [ofDayToTime ti] creates a Time attribute from a
  * Core.Time.Ofday.t data type.
  *)
-val ofDayToTime : Core.Time.Ofday.t -> attr
+val ofDayToTime : Time.Ofday.t -> attr
+
+(**
+ * [xConvert fl] creates an X attribute from a
+ * float.
+ *)
+val xConvert : float -> attr
+
+(**
+ * [yConvert fl] creates a Y attribute from a
+ * float.
+ *)
+val yConvert : float -> attr
 
 (**
  * [updateTree dat tl] edits a Leaf, as in [editTree],
