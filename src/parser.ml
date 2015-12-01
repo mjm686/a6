@@ -25,11 +25,22 @@ type data = {
   y: float 
 } and day = | Mon | Tue | Wed | Thur | Fri | Sat | Sun | Unknown
 
-type output = float list
+type output = int * (cat*float) list
 
 exception BadData
 exception EOF of data list
 exception InvalidInput of output 
+
+let classes = 
+  [ARSON;ASSAULT;BADCHECKS;BRIBERY;BURGLARY;DISORDERLY 
+  ;DRIVING;DRUG;DRUNK;EMBEZZLE
+;EXTORTION;FAMILY;FORGERY;FRAUD;GAMBLING 
+;KIDNAPPING;LARCENY;LIQUOR;LOITER;MISSING 
+;NONCRIMINAL;OTHER;PORN;PROSTITUTION 
+;RECOVERED;ROBBERY;RUNAWAY;SECONDARY
+;SEXOFFENSESF;SEXOFFENSESNF;STOLEN
+;SUICIDE;SUSPICIOUS;TREA;TRESPASS;VANDALISM;VEHICLE 
+;WARRANTS;WEAPON]
 
 let load_file fname = 
   let ic = open_in fname in
@@ -266,16 +277,26 @@ let parse_fold ic =
 let print_all data = 
   List.iter print_single data
 
-let rec stringify csv = 
-  match csv with
+(* ls is an associative list of class and prob (float) *)
+let rec format_output_helper classes ls = 
+  match classes with
+  | [] -> []
+  | h::t ->
+      let p = try List.assoc h ls with
+      | Not_found -> 0.0 in
+      let p = 
+        if p = 0.0 then string_of_int (int_of_float p) 
+        else string_of_float p in
+      p::(format_output_helper t ls)  
+
+(* formats an output list into string list list *)
+let rec format_output outputs = 
+  match outputs with
   | [] -> []
   | h::t -> begin
-    let s_h = 
-      match h with
-      | [] -> raise (InvalidInput h)
-      | h1::t1 -> (string_of_int (int_of_float h1))::
-        (List.map (fun f -> string_of_float f) t1) in
-    s_h::(stringify t)
+    let id = string_of_int (fst h) in
+    let tl = format_output_helper classes (snd h) in
+    (id::tl)::(format_output t)
   end
 
 (* Functions in mli implemented *)
@@ -284,10 +305,9 @@ let parse_test ic = parse ic true
 let parse_train ic = parse_fold ic
 
 let write_to fname csv = 
-  let csv = stringify csv in
-  let oc = open_out fname in
-  let oc = Csv.to_channel oc in
-  Csv.output_all oc csv
+  let csv = format_output csv in
+  let oc = Csv.to_channel (open_out fname) in
+  List.iter (fun i -> Csv.output_record oc i) csv
 
 let data_to_string (d: data) : string list = 
   let id = string_of_int d.id in
