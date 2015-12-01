@@ -6,7 +6,6 @@ type attr =
   | X of float
   | Y of float
   | Day of day
-and day = Mon | Tue | Wed | Thu | Fri | Sat | Sun | Unk
 
 type tree =
 	| Leaf of leaf
@@ -180,12 +179,6 @@ val editTree4 : attr -> attr -> attr -> cat
  *)
 val editTree : attr -> attr -> attr -> attr
 -> cat -> tree list -> unit
-
-(**
- * [dayToDate d] creates a Date attribute from a
- * Parser.day data type.
- *)
-val dayToDate : Parser.day -> attr
 
 (**
  * [ofDayToTime ti] creates a Time attribute from a
