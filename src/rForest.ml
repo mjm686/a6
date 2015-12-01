@@ -173,15 +173,28 @@ let rec editTree (aDay : attr) (aTime : attr)
   then (editTree4 aTime aX aY categ (nodeListGet h))
   else (editTree aDay aTime aX aY categ t);;
 
-let ofDayToTime (ti : Core.Time.Ofday.t) : attr =
-  Time (Pervasives.int_of_float ti);;
+let ofDayToTime (ti : Time.Ofday.t) : attr =
+  Time (Pervasives.int_of_float
+    (Time.Ofday.to_float ti));;
+
+let yConvert (fY : float) : attr =
+  let newY = (fY -. 37.69) /. 0.15 in
+  if newY < 0. then Y 0. else
+  if newY >= 1. then Y 0.9 else
+  Y ((Pervasives.floor (10. *. newY)) /. 10.);;
+
+let xConvert (fX : float ) : attr =
+  let newX = (fX +. 122.53) /. 0.2 in
+  if newX < 0. then X 0. else
+  if newX >= 1. then X 0.9 else
+  X ((Pervasives.floor (10. *. newX)) /. 10.);;
 
 let updateTree (dat : data) (tl : tree list)
 : unit =
   editTree (Day dat.dayOfWeek)
-  (Time ofDayToTime (dat.ofDay))
-  (X (dat.x))
-  (Y (dat.y))
+  (ofDayToTime (dat.ofDay))
+  (xConvert dat.x)
+  (yConvert dat.y)
   (dat.category)
   (tl);;
 
