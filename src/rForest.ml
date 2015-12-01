@@ -5,9 +5,7 @@ type attr =
   | Time of int
   | X of float
   | Y of float
-  | Date of date
-and date = MON | TUE | WED | THU
-         | FRI | SAT | SUN | UNK
+  | Day of day
 
 type tree =
   | Leaf of leaf
@@ -74,9 +72,9 @@ let timeList =
   12; 13; 14; 15; 16; 17;
   18; 19; 20; 21; 22; 23]
 
-let dateList =
-  [MON; TUE; WED; THU;
-  FRI; SAT; SUN; UNK]
+let dayList =
+  [Mon; Tue; Wed; Thur;
+  Fri; Sat; Sun; Unknown]
 
 let rec makeLeaves (l : cat list) : tree list =
   match l with
@@ -107,18 +105,18 @@ let rec makeNodes3 (il : int list)
   (Node {t=(makeNodes2 fl1 fl2 cl);a=Time h})::
   makeNodes3 t fl1 fl2 cl;;
 
-let rec makeNodes (dl : date list)
+let rec makeNodes (dl : day list)
 (il : int list) (fl1 : float list)
 (fl2 : float list)
 (cl : cat list) : tree list =
   match dl with
   |[] -> []
   |h::t ->
-  (Node {t=(makeNodes3 il fl1 fl2 cl);a=Date h})::
+  (Node {t=(makeNodes3 il fl1 fl2 cl);a=Day h})::
   makeNodes t il fl1 fl2 cl;;
 
 let hollowForest (unit) : tree list =
-  makeNodes dateList timeList
+  makeNodes dayList timeList
   coordList coordList catList;;
 
 let leafBool (categ : cat) = function
@@ -175,30 +173,19 @@ let rec editTree (aDay : attr) (aTime : attr)
   then (editTree4 aTime aX aY categ (nodeListGet h))
   else (editTree aDay aTime aX aY categ t);;
 
-let dayToDate (d : Parser.day) : attr =
-  match d with
-  |Mon -> Date MON
-  |Tue -> Date TUE
-  |Wed -> Date WED
-  |Thur -> Date THU
-  |Fri -> Date FRI
-  |Sat -> Date SAT
-  |Sun -> Date SUN
-  |_ -> Date UNK;;
-
 let ofDayToTime (ti : Core.Time.Ofday.t) : attr =
   Time (Pervasives.int_of_float ti);;
 
 let updateTree (dat : data) (tl : tree list)
 : unit =
-  editTree (dayToDate (dat.dayOfWeek))
-  (ofDayToTime (dat.ofDay))
+  editTree (Day dat.dayOfWeek)
+  (Time ofDayToTime (dat.ofDay))
   (X (dat.x))
   (Y (dat.y))
   (dat.category)
   (tl);;
 
-let randomForest (datl : data list)
+let rec randomForest (datl : data list)
 (tl : tree list) : tree list =
   match datl with
   |[] -> tl
