@@ -1,4 +1,3 @@
-open Parser
 open ExpGradient
 
 (** [eval] runs 4-fold cross validation with the EG algorithm to give weights
@@ -8,4 +7,4 @@ open ExpGradient
  *  [eval d] takes the parsed traning data and returns a set of weights for
  *  outputting the final predictions for the testing data
  * *)
-val eval : data list -> weights
+val eval : unit -> weights

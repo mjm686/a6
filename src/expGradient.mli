@@ -4,8 +4,8 @@ type prediction
 (* record type to keep track of the weights of algorithms
  * all weights sum up to 1 always *)
 type weights
+type algo
 
-type loss
 (** [init] initiates a set of equal weights that sum to 1 for all algorithms
  *
  *  [init ()] returns a weights record

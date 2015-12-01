@@ -3,7 +3,6 @@ open Parser
 open ExpGradient
 
 exception End
-exception EndWithData
 
 (* Only need to ever run once to shuffle the data and write to 
  * different files *)
@@ -18,8 +17,4 @@ let cross_valid () =
     | End -> () in
   helper ic 
 
-let ic = load_file "test_fold4.csv" in
-let dl = parse_train ic in
-Printf.printf "total %d\n" (List.length dl)
-
-let eval dl = failwith "TODO"
+let eval () = failwith "TODO"

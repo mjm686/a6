@@ -1,8 +1,3 @@
-open DecisionTree
-open KNN
-open Parser
-open ClassifierEval
-
 type fname
 
 (** [main] is the main method of the project. It loads training data from

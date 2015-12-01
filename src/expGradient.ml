@@ -1,7 +1,8 @@
 open Parser
 
+type algo = | KNN | RF | Bayes
+
 type prediction = (algo * cat * cat)
-and algo = | KNN | RF | Bayes
 
 type weights = {
   mutable knn: float;
