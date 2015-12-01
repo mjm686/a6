@@ -68,6 +68,11 @@ val getLeafs : data -> tree list -> tree list
 val getI : tree -> int
 
 (**
+ * [getC lf] returns the value lf.c of Leaf i.
+ *)
+val getC : tree -> int
+
+(**
  * [total tl] returns a the total number of crimes
  * recorded for a given list of Leafs tl.
  *
@@ -77,70 +82,94 @@ val getI : tree -> int
 val total : tree list -> int
 
 (**
- * [divideIntoFloat i1 i2] converts integers i1
- * and i2 into floats and divides them.
+ * [mostPrevalent tl i categ] returns a category.
+ *
+ * The category corresponds to the Leaf in tl
+ * with the greatest i value; otherwise it
+ * returns categ.
  *)
-val divideIntoFloat : int -> int -> float
+val mostPrevalent : tree list -> int -> cat
+-> cat
 
 (**
- * [singlePair tl lf] returns a pair containing a
- * category and a float.
+ * [predict1 tl aY] returns a category.
  *
- * The category is lf.c and the float is
- * lf.i divided by the total number of crimes in
- * list tl, assuming lf is a Leaf. If Leaf lf is
- * in list tl, the float will represent the
- * percentage of crimes of type lf.c in the
- * list tl.
- *
- * If lf is a Node, the pair returned will instead
- * contain category UNDETERMINED and float 0.
+ * It runs [mostPrevalent] on the Leaf list
+ * corresponding to the node containing aY
+ * in the list tl.
  *)
-val singlePair : tree list -> tree -> cat * float
+val predict1 : tree list -> attr -> cat
 
 (**
- * [listPair tl tlr] returns a list of pairs
- * containing a category and a float.
+ * [predict2 tl aX aY] returns a category.
  *
- * listPair takes in a list of trees (both tl
- * and tlr should be the same tree list) and
- * outputs a list of pairs; each pair is
- * the result of [singlePair] being applied
- * to an element of tl.
+ * It runs [predict1] on the Node list
+ * corresponding to the node containing aX
+ * in the list tl.
  *)
-val listPair : tree list -> tree list
--> (cat * float) list
+val predict2 : tree list -> attr -> attr -> cat
 
 (**
- * [predict dat tl] returns a list of pairs of categories
- * and floats.
+ * [predict3 tl aTime aX aY] returns a category.
  *
- * The floats are probabilities, summing to 1, of the
- * predicted likelyhood of the corresponding crime
- * type, predicted based on a location and time given in
- * dat. These predictions are based on decision trees
- * created with training data and stored in tl.
+ * It runs [predict2] on the Node list
+ * corresponding to the node containing aTime
+ * in the list tl.
  *)
-val predict : data -> tree list -> (cat*float) list
+val predict3 : tree list -> attr -> attr
+-> attr -> cat
 
 (**
- * [predict dl tl] returns a list of lists of pairs
- * of categories and floats.
+ * [predict4 tl aDay aTime aX aY] returns a category.
  *
- * predictions runs [predict] on each element of dl
- * and returns the resulting lists of pairs in a list.
+ * It runs [predict3] on the Node list
+ * corresponding to the node containing aDay
+ * in the list tl.
+ *)
+val predict4 : tree list -> attr -> attr
+-> attr -> attr -> cat
+
+(**
+ * [predictCat dat tl] returns a category.
+ *
+ * It runs [predict4] on the list tl and
+ * returns the category predicted based on
+ * time and location information in dat.
+ *)
+val predictCat : data -> tree list -> cat
+
+(**
+ * [predict dat tl] returns a value of the form
+ * (int, (cat, cat)).
+ *
+ * The list predicts a crime type based on time
+ * and location data in dat and returns
+ * (dat's id, (category of crime recorded in dat,
+ * predicted category of crime)).
+ *)
+val predict : data -> tree list
+-> int * (cat * cat)
+
+(**
+ * [predictions dl tl] returns a list values of
+ * the form (int, (cat, cat)).
+ *
+ * predictions runs [predict] on each element
+ * of dl and returns the resulting values in
+ * a list.
  *)
 val predictions : data list -> tree list ->
-(cat*float) list list
+(int * (cat * cat)) list
 
 (**
- * [finale dl1 dl2] returns a list of lists of pairs
- * of categories and floats.
+ * [finale train test] returns a list values of
+ * the form (int, (cat, cat)).
  *
- * finale uses data list dl1 as "training data" to
- * construct a "random forest" of decision trees.
- * This forest is then used to run [predictions]
- * on the data list dl2 (the "testing data").
+ * finale uses data list train as "training data"
+ * to construct a "random forest" of decision
+ * trees. This forest is then used to run
+ * [predictions] on the data list test (the
+ * "testing data").
  *)
 val finale : data list -> data list ->
-(cat*float) list list
+(int * (cat * cat)) list
