@@ -1,9 +1,12 @@
 open CrossValid
 open Parser
+open ExpGradient
 
 exception End
 exception EndWithData
 
+(* Only need to ever run once to shuffle the data and write to 
+ * different files *)
 let cross_valid () = 
   let ic = load_file "../data/train.csv" in
   let rec helper ic = 

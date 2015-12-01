@@ -4,7 +4,7 @@ type prediction
 (* record type to keep track of the weights of algorithms
  * all weights sum up to 1 always *)
 type weights
-type param
+
 type loss
 (** [init] initiates a set of equal weights that sum to 1 for all algorithms
  *
@@ -18,4 +18,4 @@ val init : unit -> weights
  *
  *  [adjust p w param] returns a new set of weights
  * *)
-val adjust : prediction -> weights -> param -> weights
+val adjust : prediction -> weights -> float -> unit
