@@ -14,7 +14,7 @@ val train  : data list -> points
  *
  * The proabilitiy is a float from 0.0 to 1.0 inclusive.
  *)
-val prior_probability  : int -> float
+val prior_probability  : cat -> float
 
 (**
  * [likelihood p cat] returns the likelihood of having point p given category
@@ -22,7 +22,7 @@ val prior_probability  : int -> float
  *
  * The proabilitiy is a float from 0.0 to 1.0 inclusive.
  *)
-val likelihood  : point -> int -> float
+val likelihood  : point -> cat -> float
 
 (**
  * [posterior_probability p cat] returns the posterior probability of
@@ -31,7 +31,7 @@ val likelihood  : point -> int -> float
  *
  * The proabilitiy is a float from 0.0 to 1.0 inclusive.
  *)
-val posterior_probability  : point -> int -> float
+val posterior_probability  : point -> cat -> float
 
 (**
  * [classify p ps] classifies a point according to training points ps.

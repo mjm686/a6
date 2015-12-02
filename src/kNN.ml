@@ -30,13 +30,25 @@ let classify p ps =
 
 (**
  * [predict d] predicts the classification of the given d under the training
- * points, and then returns the predicted category.
+ * points, and then returns a tuple of the correct category with the
+ * predicted category.
  *
  * Note the prediction relies heavily on the choice of distance used in the
  * algorithm, as well as the method of classifying categorical variable
  * distances.
  *)
-let predict p =
+let predict d =
   let p = Point.create_point d
   let ps = !points_data in
-  classify p ps
+  let p2 = classify p ps in
+  ((Point.classification p), (Point.classification p2))
+
+(**
+ * [predict_all dl] tbd
+ *)
+let predict_all dl =
+  let rec loop dl out =
+    match dl with
+      | h::t -> let id = h.id in
+                loop t (id, (predict h))::out
+      | [] -> []
