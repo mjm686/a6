@@ -172,4 +172,4 @@ val predictions : data list -> tree list ->
  * "testing data").
  *)
 val finale : data list -> data list ->
-(int * (cat*float) list) list
+(int * (cat * cat)) list
