@@ -45,4 +45,9 @@ val classify  : point -> points -> point
  * points, and then returns the predicted category.
  *
  *)
-val predict  : data -> points -> cat
+val predict  : data -> (cat * cat)
+
+(**
+ * [predict_all dl] tbd
+ *)
+val predict_all : data list -> (int * (cat * cat))

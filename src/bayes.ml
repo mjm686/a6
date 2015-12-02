@@ -81,7 +81,17 @@ let posterior_probability p cat =
  *
  * It returns a new point of the predicted category.
  *)
-let classify =
+let classify p ps =
+  let c = ref UNDETERMINED in
+  let n = ref 0. in
+  let _ =
+  (for i = 1 to 38 do
+    let x = Point.get_category i in
+    let p = posterior_probability p x in
+    if p >= n then (c := x);(n := p) else ()
+  done) in
+  !c
+
 
 (**
  * [predict d] predicts the classification of the given d under the training
@@ -91,4 +101,15 @@ let classify =
 let predict d =
   let p = Point.create_point d
   let ps = !points_data in
-  classify p ps
+  let p2 = classify p ps in
+  ((Point.classification p), (Point.classification p2))
+
+(**
+ * [predict_all dl] tbd
+ *)
+let predict_all dl =
+  let rec loop dl out =
+    match dl with
+      | h::t -> let id = h.id in
+                loop t (id, (predict h))::out
+      | [] -> []
