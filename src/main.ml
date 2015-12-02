@@ -14,6 +14,9 @@ let main train test output =
   let weights = eval () in
   (* let knn_result = knn_classify test (knn_train d) in
    * let bayes_result = bayes_classify test (bayes_train d) in
+   * *)
+  let rf_result = finale d test in
+  (*
    * let rf_result = rf_classify test (rf_train d) in
    * write_output output (results) weights;)    
    * *)
