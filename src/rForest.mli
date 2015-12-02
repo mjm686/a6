@@ -6,7 +6,6 @@ type attr =
   | X of float
   | Y of float
   | Day of day
-and day = Mon | Tue | Wed | Thu | Fri | Sat | Sun | Unk
 
 type tree =
 	| Leaf of leaf
@@ -182,16 +181,22 @@ val editTree : attr -> attr -> attr -> attr
 -> cat -> tree list -> unit
 
 (**
- * [dayToDate d] creates a Date attribute from a
- * Parser.day data type.
- *)
-val dayToDate : Parser.day -> attr
-
-(**
  * [ofDayToTime ti] creates a Time attribute from a
  * Core.Time.Ofday.t data type.
  *)
-val ofDayToTime : Core.Time.Ofday.t -> attr
+val ofDayToTime : Time.Ofday.t -> attr
+
+(**
+ * [xConvert fl] creates an X attribute from a
+ * float.
+ *)
+val xConvert : float -> attr
+
+(**
+ * [yConvert fl] creates a Y attribute from a
+ * float.
+ *)
+val yConvert : float -> attr
 
 (**
  * [updateTree dat tl] edits a Leaf, as in [editTree],

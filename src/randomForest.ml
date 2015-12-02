@@ -6,7 +6,7 @@ let rec getLeafs1 (aY : attr)
   |[] -> []
   |h::t -> if (nodeBool aY h)
   then (nodeListGet h)
-  else (editTree2 aY t);;
+  else (getLeafs1 aY t);;
 
 let rec getLeafs2 (aX : attr) (aY : attr)
 (tl : tree list) : tree list = match tl with
@@ -33,8 +33,8 @@ let rec getLeafs4 (aDay : attr) (aTime : attr)
 
 let rec getLeafs (dat : data) (tl : tree list)
 : tree list =
-  getLeafs4 (dayToDate (dat.dayOfWeek))
-  (ofDayToTime (dat.ofDay))
+  getLeafs4 (Day (dat.dayOfWeek))
+  (Time ofDayToTime (dat.ofDay))
   (X (dat.x))
   (Y (dat.y))
   (tl);;
@@ -43,41 +43,80 @@ let getI = function
   |Leaf l -> l.i
   |Node _ -> 0;;
 
+let getC = function
+  |Leaf l -> l.c
+  |Node _ -> UNDETERMINED;;
+
 let rec total (tl : tree list) : int =
   match tl with
   |[] -> 0
   |h::t -> (getI h) + (total t);;
 
-let divideIntoFloat (i1 : int) (i2 : int)
-: float =
-  (Pervasives.float_of_int i1) /.
-  (Pervasives.float_of_int i2);;
-
-let singlePair (tl : tree list) = function
-  |Node _ -> (UNDETERMINED, 0.)
-  |Leaf l -> if (total tl = 0)
-    then (UNDETERMINED, 0.)
-    else (l.c,
-      divideIntoFloat l.i (total tl));;
-
-let rec listPair (tl : tree list)
-(tlr : tree list) : (cat * float) list =
+let rec mostPrevalent (tl : tree list)
+(i : int) (categ : cat) : cat =
   match tl with
-  |[] -> []
-  |h::t -> (singlePair tlr h)::
-  (listPair t tlr);;
+  |[] -> categ
+  |h::t -> if (getI h > i)
+  then mostPrevalent t (getI h) (getC h)
+  else mostPrevalent t i categ;;
+
+let rec predict1 (tl : tree list)
+(aY : attr) : cat =
+  match tl with
+  |[] -> UNDETERMINED
+  |h::t -> if (nodeBool aY h)
+  then mostPrevalent (nodeListGet h) 0
+  UNDETERMINED
+  else predict1 t aY;;
+
+let rec predict2 (tl : tree list)
+(aX : attr) (aY : attr) : cat =
+  match tl with
+  |[] -> UNDETERMINED
+  |h::t -> if (nodeBool aX h)
+  then predict1 (nodeListGet h) aY
+  else predict2 t aX aY;;
+
+let rec predict3 (tl : tree list)
+(aTime : attr) (aX : attr) (aY : attr)
+: cat =
+  match tl with
+  |[] -> UNDETERMINED
+  |h::t -> if (nodeBool aTime h)
+  then predict2 (nodeListGet h) aX aY
+  else predict3 t aTime aX aY;;
+
+let rec predict4 (tl : tree list)
+(aDay : attr) (aTime : attr) (aX : attr)
+(aY : attr) : cat =
+  match tl with
+  |[] -> UNDETERMINED
+  |h::t -> if (nodeBool aDay h)
+  then predict3 (nodeListGet h) aTime aX aY
+  else predict4 t aDay aTime aX aY;;
+
+let predictCat (dat : data) (tl : tree list)
+: cat =
+  predict4 tl (Day dat.dayOfWeek)
+  (Time ofDayToTime (dat.ofDay))
+  (X (dat.x))
+  (Y (dat.y));;
 
 let predict (dat : data) (tl : tree list)
-: (cat * float) list =
-  listPair (getLeafs dat tl) (getLeafs dat tl);;
+: int * (cat * cat) =
+  ((dat.id), (dat.category,
+    (predictCat dat tl);;
 
-let predictions (datl : data list)
-(tl : tree list) : (cat * float) list list =
-  match datl with
+let rec predictions (datlist : data list)
+(tl : tree list)
+: (int * (cat * cat)) list =
+  match datlist with
   |[] -> []
-  |h::t -> (predict h tl)::(predictions t tl);;
+  |h::t ->
+  (predict h tl)::(predictions t tl);;
 
-let finale (datl1 : data list) (datl2 : data list)
-: (cat * float) list list =
-  predictions datl2
-  (randomForest datl1 (hollowForest()));;
+let finale (train : data list)
+(test : data list)
+: (int * (cat * cat)) list =
+  predictions test
+  (randomForest train (hollowForest ()));;

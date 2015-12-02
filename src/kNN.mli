@@ -22,4 +22,9 @@ val classify  : point -> points -> point
  * algorithm, as well as the method of classifying categorical variable
  * distances.
  *)
-val predict  : data -> cat
+val predict  : data -> (cat * cat)
+
+(**
+ * [predict_all dl] tbd
+ *)
+val predict_all : data list -> (int * (cat * cat))

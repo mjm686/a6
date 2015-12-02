@@ -43,12 +43,17 @@ val classification : point -> cat
 (**
  * tbd
  *)
-val tally_cats : points -> (cat * int) list
+val get_category : int -> cat
 
 (**
  * tbd
  *)
-val get_category : int -> cat
+val get_number : cat -> int
+
+(**
+ * tbd
+ *)
+val tally_cats : points -> (cat * int) list
 
 (**
  * [num_of_class ps cat] returns the number of points of the given category

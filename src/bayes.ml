@@ -25,7 +25,8 @@ let train  =
  * The proabilitiy is a float from 0.0 to 1.0 inclusive.
  *)
 let prior_probability cat =
-  let n = float_of_int (List.assoc cat !points_cat_tally)
+  let cat_num = Point.get_number in
+  let n = float_of_int (List.assoc cat_num !points_cat_tally) in
   let d = float_of_int !num_points in
   n /. d
 
