@@ -11,6 +11,11 @@ type point
 type points
 
 (**
+ * tbd
+ *)
+type features
+
+(**
  * [create_point d] creates an individual 6-dimensional point from the given
  *  data.
  *)
@@ -34,6 +39,11 @@ val distance  : point -> point -> float
  * within the given distance.
  *)
 val points_within  : float -> point -> points -> points
+
+(**
+ * tbd
+ *)
+val points_within_feat  : float -> point -> feature -> points -> points
 
 (**
  * [classification p] returns the category classification of the given point.

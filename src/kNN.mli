@@ -16,7 +16,8 @@ val classify  : point -> points -> point
 
 (**
  * [predict d] predicts the classification of the given d under the training
- * points, and then returns the predicted category.
+ * points, and then returns a tuple of the correct category with the
+ * predicted category.
  *
  * Note the prediction relies heavily on the choice of distance used in the
  * algorithm, as well as the method of classifying categorical variable

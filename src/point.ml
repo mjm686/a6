@@ -19,6 +19,8 @@ type point = {
  *)
 type points = point list
 
+type features = DATE | OFDAY | DAYOFWEEK | X | Y
+
 (**
  * [create_point d] creates an individual 6-dimensional point from the given
  *  data.
@@ -49,6 +51,21 @@ let create_point d =
 let create_points d =
   List.map (fun x -> create_point x) d
 
+let date_distance p1 p2 =
+  p2.date - p1.date
+
+let ofDay_distance p1 p2 =
+  p2.ofDay - p1.ofDay
+
+let dayOfWeek_distance p1 p2 =
+  if p1.dayOfWeek = p2.dayOfWeek then 0 else 1
+
+let x_distance p1 p2 =
+  p2.x - p1.x
+
+let x_distance p1 p2 =
+  p2.y - p1.y
+
 (**
  * [distance p1 p2] calculates the Euclidean distance between two points p1
  * and p2.
@@ -68,6 +85,13 @@ let distance p1 p2 =
 let points_within  k p ps =
   List.filter (fun x -> (distance p x) <= k) ps
 
+let points_within_feat k p feat ps =
+  match feat with
+  | DATE -> List.filter (fun x -> (date_distance p x) <= k) ps
+  | OFDAY -> List.filter (fun x -> (ofDay_distance p x) <= k) ps
+  | DAYOFWEEK -> List.filter (fun x -> (dayOfWeek_distance p x) <= k) ps
+  | X -> List.filter (fun x -> (x_distance p x) <= k) ps
+  | Y -> List.filter (fun x -> (y_distance p x) <= k) ps
 
 (**
  * [classification p] returns the category classification of the given point.
@@ -150,7 +174,7 @@ let tally_cats ps =
                 loop t n_list
       | [] -> ()
   let out = loop c_list n_list in
-  List.map (fun x -> (fst x, !(snd x))) out
+  List.map (fun x -> (get_category(fst x), !(snd x))) out
 
 (**
  * [num_of_class ps cat] returns the number of points of the given category
