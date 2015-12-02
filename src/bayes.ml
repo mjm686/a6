@@ -44,22 +44,22 @@ let likelihood p cat =
   let s_num = List.length s in
   let date_p = s_num /. t_num in
 
-  let ofDay =
+  let ofDay = p.ofDay in
   let s = Point.points_within_feat 30. p OFDAY !points_data in
   let s_num = List.length s in
   let ofDay_p = s_num /. t_num in
 
-  let dayOfWeek =
+  let dayOfWeek = p.dayOfWeek in
   let s = Point.points_within_feat 0.5 p DAYOFWEEK !points_data in
   let s_num = List.length s in
   let dayOfWeek_p = s_num /. t_num in
 
-  let x =
+  let x = p.x in
   let s = Point.points_within_feat 0.005 p X !points_data in
   let s_num = List.length s in
   let x_p = s_num /. t_num in
 
-  let y =
+  let y = p.y in
   let s = Point.points_within_feat 0.005 p Y !points_data in
   let s_num = List.length s in
   let y_p = s_num /. t_num in
@@ -86,9 +86,9 @@ let classify p ps =
   let n = ref 0. in
   let _ =
   (for i = 1 to 38 do
-    let x = Point.get_category i in
+    (let x = Point.get_category i in
     let p = posterior_probability p x in
-    if p >= n then (c := x);(n := p) else ()
+    if p >= n then ((c := x);(n := p)) else ())
   done) in
   !c
 
@@ -99,7 +99,7 @@ let classify p ps =
  *
  *)
 let predict d =
-  let p = Point.create_point d
+  let p = Point.create_point d in
   let ps = !points_data in
   let p2 = classify p ps in
   ((Point.classification p), (Point.classification p2))
@@ -112,4 +112,5 @@ let predict_all dl =
     match dl with
       | h::t -> let id = h.id in
                 loop t (id, (predict h))::out
-      | [] -> []
+      | [] -> [] in
+  loop dl []

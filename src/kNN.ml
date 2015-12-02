@@ -20,8 +20,8 @@ let train l =
  *)
 let classify p ps =
 
-  let ps_sub = Point.points_within 10. p ps in
-  let l = Point.tally_cats ps_sub
+  let ps_sub = Point.points_within 1. p ps in
+  let l = Point.tally_cats ps_sub in
   let l = List.sort (fun x y -> if snd x > snd y then (-1) else 1) l in
   let x = List.hd l in
   let out = fst x in
@@ -38,7 +38,7 @@ let classify p ps =
  * distances.
  *)
 let predict d =
-  let p = Point.create_point d
+  let p = Point.create_point d in
   let ps = !points_data in
   let p2 = classify p ps in
   ((Point.classification p), (Point.classification p2))
@@ -51,4 +51,5 @@ let predict_all dl =
     match dl with
       | h::t -> let id = h.id in
                 loop t (id, (predict h))::out
-      | [] -> []
+      | [] -> [] in
+  loop dl []

@@ -1,4 +1,4 @@
-Open Parser
+open Parser
 
 (**
  * Represents a 6-dimensional data point from data fields of a given crime.
@@ -28,10 +28,10 @@ type features = DATE | OFDAY | DAYOFWEEK | X | Y
 let create_point d =
   let dt = d.date in
   let day = Date0.day dt in
-  let month = Month.to_int (Date0.month dt)
-  let dt = float_of_int(month * 30 + day)
+  let month = Month.to_int (Date0.month dt) in
+  let dt = float_of_int(month * 30 + day) in
 
-  let tm = Span.minute (Time.Ofday.to_span_since_start_of_day d.ofDay)
+  let tm = Span.minute (Time.Ofday.to_span_since_start_of_day d.ofDay) in
 
   {
    id = d.id;
@@ -52,19 +52,19 @@ let create_points d =
   List.map (fun x -> create_point x) d
 
 let date_distance p1 p2 =
-  p2.date - p1.date
+  p2.date -. p1.date
 
 let ofDay_distance p1 p2 =
-  p2.ofDay - p1.ofDay
+  p2.ofDay -. p1.ofDay
 
 let dayOfWeek_distance p1 p2 =
   if p1.dayOfWeek = p2.dayOfWeek then 0 else 1
 
 let x_distance p1 p2 =
-  p2.x - p1.x
+  p2.x -. p1.x
 
 let x_distance p1 p2 =
-  p2.y - p1.y
+  p2.y -. p1.y
 
 (**
  * [distance p1 p2] calculates the Euclidean distance between two points p1
@@ -72,17 +72,13 @@ let x_distance p1 p2 =
  *)
 let distance p1 p2 =
   let d = sqrt (
-            ((date_distance p1 p2)      **2.) +.
-            ((ofDay_distance p1 p2)     **2.) +.
-            ((dayOfWeek_distance p1 p2) **2.) +.
-            ((x_distance p1 p2)         **2.) +.
-            ((y_distance p1 p2))        **2.
-          )
-
-
-  let d = sqrt (((p2.date - p1.date)**2.) +. ((p2.ofDay - p1.ofDay)**2.) +.
-          ((p2.x - p1.x)**2.) +. ((p2.y - p1.y))**2.
-           +. (d1)**2. )
+            (((date_distance p1 p2) /. 5.)       ** 2.) +.
+            (((ofDay_distance p1 p2) /. 30.)     ** 2.) +.
+            (((dayOfWeek_distance p1 p2))        ** 2.) +.
+            (((x_distance p1 p2) /. 0.005)       ** 2.) +.
+            (((y_distance p1 p2)) /. 0.005)      ** 2.
+          ) in
+  d
 
 (**
  * [points_within k p ps] returns a list of points within the given distance.
@@ -146,7 +142,7 @@ let get_category = function
   | 36 -> VEHICLE
   | 37 -> WARRANTS
   | 38 -> WEAPON
-  | _ -> failwith("Error") );
+  | _ -> failwith("Error")
 
 let get_number cat =
     let l = [(ARSON, 0); (ASSAULT, 1); (BADCHECKS, 2);
@@ -161,11 +157,11 @@ let get_number cat =
             (SEXOFFENSESF, 28); (SEXOFFENSESNF, 29); (STOLEN, 30);
             (SUICIDE, 31); (SUSPICIOUS, 32); (TREA, 33);
             (TRESPASS, 34); (VANDALISM, 35); (VEHICLE, 36);
-            (WARRANTS, 37); (WEAPON, 38)]
+            (WARRANTS, 37); (WEAPON, 38)] in
     List.assoc cat l
 
 let tally_cats ps =
-  let c_list = List.map (fun x -> classification x) ps
+  let c_list = List.map (fun x -> classification x) ps in
   let n_list = [(0, ref 0); (1, ref 0); (2, ref 0); (3, ref 0);
                 (4, ref 0); (5, ref 0); (6, ref 0); (7, ref 0);
                 (8, ref 0); (9, ref 0); (10, ref 0); (11, ref 0);
@@ -175,12 +171,12 @@ let tally_cats ps =
                 (24, ref 0); (25, ref 0); (26, ref 0); (27, ref 0);
                 (28, ref 0); (29, ref 0); (30, ref 0); (31, ref 0);
                 (32, ref 0); (33, ref 0); (34, ref 0); (35, ref 0);
-                (36, ref 0); (37, ref 0); (38, ref 0)]
+                (36, ref 0); (37, ref 0); (38, ref 0)] in
   let rec loop c_list n_list =
     match c_list with
-      | h::t -> (incr (List.assoc (get_number h) n_list);
+      | h::t -> (incr (List.assoc (get_number h) n_list));
                 loop t n_list
-      | [] -> ()
+      | [] -> [] in
   let out = loop c_list n_list in
   List.map (fun x -> (get_category(fst x), !(snd x))) out
 
@@ -192,6 +188,6 @@ let num_of_class ps cat =
   let rec loop ps cat i =
     match ps with
     | h::t -> if (h = cat) then (incr i); loop t cat i
-    | [] -> i
+    | [] -> i in
   let i : (int ref) = ref 0 in
   loop ps cat i
