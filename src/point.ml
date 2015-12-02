@@ -35,8 +35,8 @@ let create_point d =
 
   {
    id = d.id;
-   date = dt
-   ofDay = tm
+   date = dt;
+   ofDay = tm;
    category = d.category;
    dayOfWeek = d.dayOfWeek;
    pdDistrict = d.pdDistrict;
@@ -71,7 +71,15 @@ let x_distance p1 p2 =
  * and p2.
  *)
 let distance p1 p2 =
-  let d1 = if p1.dayOfWeek = p2.dayOfWeek then 0 else 1
+  let d = sqrt (
+            ((date_distance p1 p2)      **2.) +.
+            ((ofDay_distance p1 p2)     **2.) +.
+            ((dayOfWeek_distance p1 p2) **2.) +.
+            ((x_distance p1 p2)         **2.) +.
+            ((y_distance p1 p2))        **2.
+          )
+
+
   let d = sqrt (((p2.date - p1.date)**2.) +. ((p2.ofDay - p1.ofDay)**2.) +.
           ((p2.x - p1.x)**2.) +. ((p2.y - p1.y))**2.
            +. (d1)**2. )

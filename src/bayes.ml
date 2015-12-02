@@ -37,12 +37,34 @@ let prior_probability cat =
  * The proabilitiy is a float from 0.0 to 1.0 inclusive.
  *)
 let likelihood p cat =
-  (** let date = p.date in
-  let t = Point.points_within 5. p !points_data in
-  let t_num = float_of_int (List.length t) in
-  let sub = Point.num_of_class t cat in*)
-  failwith("tbd")
+  let t_num = List.assoc cat (!points_cat_tally) in
 
+  let date = p.date in
+  let s = Point.points_within_feat 5. p DATE !points_data in
+  let s_num = List.length s in
+  let date_p = s_num /. t_num in
+
+  let ofDay =
+  let s = Point.points_within_feat 30. p OFDAY !points_data in
+  let s_num = List.length s in
+  let ofDay_p = s_num /. t_num in
+
+  let dayOfWeek =
+  let s = Point.points_within_feat 0.5 p DAYOFWEEK !points_data in
+  let s_num = List.length s in
+  let dayOfWeek_p = s_num /. t_num in
+
+  let x =
+  let s = Point.points_within_feat 0.005 p X !points_data in
+  let s_num = List.length s in
+  let x_p = s_num /. t_num in
+
+  let y =
+  let s = Point.points_within_feat 0.005 p Y !points_data in
+  let s_num = List.length s in
+  let y_p = s_num /. t_num in
+
+  date_p *. ofDay_p *. dayOfWeek_p *. x_p *. y_p
 
 (**
  * [posterior_probability p cat] returns the posterior probability of
