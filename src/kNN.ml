@@ -12,7 +12,7 @@ let kNN_train l =
 (**
  * [classify p ps] classifies a point according to training points ps.
  *
- * It returns a new point of the predicted category.
+ * It returns the predicted category.
  *)
 let classify p ps =
 
@@ -21,7 +21,7 @@ let classify p ps =
   let l = List.sort (fun x y -> if snd x > snd y then (-1) else 1) l in
   let x = List.hd l in
   let out = fst x in
-  get_category out
+  out
 
 
 (**
@@ -35,8 +35,8 @@ let classify p ps =
  *)
 let predict d ps =
   let p = create_point d in
-  let p2 = classify p ps in
-  ((classification p), (classification p2))
+  let c_pred = classify p ps in
+  ((classification p), c_pred)
 
 (**
  * [kNN_predict_all dl ps] tbd
@@ -45,6 +45,6 @@ let kNN_predict_all dl ps =
   let rec loop dl out =
     match dl with
       | h::t -> let id = h.id in
-                loop t (id, (predict h ps))::out
+                loop t ((id, (predict h ps))::out)
       | [] -> [] in
   loop dl []
