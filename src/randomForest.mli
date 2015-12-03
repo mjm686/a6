@@ -1,5 +1,6 @@
 open Parser
 open RForest
+open Core
 
 (**
  * [getLeafs1 aY tl] returns a new tree list based on
