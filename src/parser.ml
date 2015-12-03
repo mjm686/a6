@@ -14,8 +14,6 @@ type cat =
  | SUICIDE | SUSPICIOUS | TREA | TRESPASS | VANDALISM | VEHICLE 
  | WARRANTS | WEAPON | UNDETERMINED | UNRECOGNIZED
 
-type day = | Mon | Tue | Wed | Thur | Fri | Sat | Sun | Unknown
-
 type data = {
   id: int;
   date: Date0.t;
@@ -25,7 +23,8 @@ type data = {
   pdDistrict: string;
   x: float;
   y: float 
-} 
+} and day = | Mon | Tue | Wed | Thur | Fri | Sat | Sun | Unknown
+
 type output = int * (cat*float) list
 
 exception BadData
@@ -219,7 +218,6 @@ let parse_fold_single ls =
     x = x;
     y = y 
   } in
-  let _ = printf "%d\n" d.id in
   Some d
 
 let compare_data d1 d2 =
