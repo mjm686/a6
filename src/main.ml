@@ -11,7 +11,7 @@ let main train test output =
   let ic_test = load_file test in
   let d = parse_train ic in
   let test = parse_test ic_test in
-  let weights = eval () in
+  (*let weights = eval () in*)
 
   let point_training = knn_train d in
   let knn_result = knn_predict_all test (point_training) in
@@ -22,4 +22,6 @@ let main train test output =
    * let rf_result = rf_classify test (rf_train d) in
    * write_output output (results) weights;)
    * *)
-  failwith "TODO"
+  ()
+
+let () = main "train_fold1.csv" "test_fold1.csv" ""
