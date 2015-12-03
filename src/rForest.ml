@@ -174,8 +174,7 @@ let rec editTree (aDay : attr) (aTime : attr)
   else (editTree aDay aTime aX aY categ t);;
 
 let ofDayToTime (ti : Time.Ofday.t) : attr =
-  Time (Pervasives.int_of_float
-    (Time.Ofday.to_float ti));;
+  Time ((Time.Ofday.to_parts ti).hr);;
 
 let yConvert (fY : float) : attr =
   let newY = (fY -. 37.69) /. 0.15 in
