@@ -252,7 +252,7 @@ let compare_data d1 d2 =
   String.compare d1 d2
 
 let counter1 = ref 0
-let id = ref 0
+(*let id = ref 0*)
 let parse ic = 
   let rec helper (acc: data list) : data list =
     if !counter1 >= 100000 then 
@@ -269,7 +269,7 @@ let parse ic =
            (* if any record fails to be in csv format, skip *) 
             printf "failed at field %d line %d because %s\n" n1 n2 s;
             Csv.next ic in
-      id := !id + 1;
+      (*id := !id + 1;*)
       counter1 := !counter1 + 1;
       let d = next_ic in
       helper ((parse_test_single d)::acc)
@@ -365,4 +365,17 @@ let rec example_parse_test acc =
   try example_parse_test dl with
   | EOF dl -> dl in
 example_parse_test []*)
+(*let ic = load_file "train_fold1.csv" in
+parse_train ic*)
+
+let ic = load_file "train_fold2.csv" in
+let rec example_parse_train acc =
+  let dl = try parse_fold ic with
+  | EOF dl -> 
+      let acc = dl@acc in 
+      let _ = raise (EOF acc) in
+      acc in
+  try example_parse_train dl with
+  | EOF dl -> dl in
+example_parse_train []
 
