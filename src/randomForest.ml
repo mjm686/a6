@@ -35,7 +35,7 @@ let rec getLeafs4 (aDay : attr) (aTime : attr)
 let rec getLeafs (dat : data) (tl : tree list)
 : tree list =
   getLeafs4 (Day (dat.dayOfWeek))
-  (Time.ofDayToTime (dat.ofDay))
+  (ofDayToTime (dat.ofDay))
   (X (dat.x))
   (Y (dat.y))
   (tl);;
@@ -99,7 +99,7 @@ let rec predict4 (tl : tree list)
 let predictCat (dat : data) (tl : tree list)
 : cat =
   predict4 tl (Day dat.dayOfWeek)
-  (Time.ofDayToTime (dat.ofDay))
+  (ofDayToTime (dat.ofDay))
   (X (dat.x))
   (Y (dat.y));;
 
