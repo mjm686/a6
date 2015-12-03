@@ -1,15 +1,14 @@
 open Parser
 open Point
 
-let points_cat_tally = ref points
-let num_points = ref int
-
+let points_cat_tally = ref (tally_cats (create_empty_points()))
+let num_points = ref 0
 
 (**
  * [bayes_train l] takes in training data and outputs the collection of points that
  * result.
  *)
-let bayes_train  =
+let bayes_train l =
   create_points l
 
 (**
@@ -20,8 +19,7 @@ let bayes_train  =
  * The proabilitiy is a float from 0.0 to 1.0 inclusive.
  *)
 let prior_probability ps cat =
-  let cat_num = get_number in
-  let n = float_of_int (List.assoc cat_num !points_cat_tally) in
+  let n = float_of_int (List.assoc cat !points_cat_tally) in
   let d = float_of_int !num_points in
   n /. d
 
@@ -32,31 +30,26 @@ let prior_probability ps cat =
  * The proabilitiy is a float from 0.0 to 1.0 inclusive.
  *)
 let likelihood p ps cat =
-  let t_num = List.assoc cat (!points_cat_tally) in
+  let t_num = float_of_int (List.assoc cat (!points_cat_tally)) in
 
-  let date = p.date in
   let s = points_within_feat 5. p DATE ps in
-  let s_num = List.length s in
+  let s_num = float_of_int (List.length s) in
   let date_p = s_num /. t_num in
 
-  let ofDay = p.ofDay in
   let s = points_within_feat 30. p OFDAY ps in
-  let s_num = List.length s in
+  let s_num = float_of_int (List.length s) in
   let ofDay_p = s_num /. t_num in
 
-  let dayOfWeek = p.dayOfWeek in
   let s = points_within_feat 0.5 p DAYOFWEEK ps in
-  let s_num = List.length s in
+  let s_num = float_of_int (List.length s) in
   let dayOfWeek_p = s_num /. t_num in
 
-  let x = p.x in
   let s = points_within_feat 0.005 p X ps in
-  let s_num = List.length s in
+  let s_num = float_of_int (List.length s) in
   let x_p = s_num /. t_num in
 
-  let y = p.y in
   let s = points_within_feat 0.005 p Y ps in
-  let s_num = List.length s in
+  let s_num = float_of_int (List.length s) in
   let y_p = s_num /. t_num in
 
   date_p *. ofDay_p *. dayOfWeek_p *. x_p *. y_p
@@ -74,7 +67,7 @@ let posterior_probability p ps cat =
 (**
  * [classify p ps] classifies a point according to training points ps.
  *
- * It returns a new point of the predicted category.
+ * It returns the predicted category.
  *)
 let classify p ps =
   let c = ref UNDETERMINED in
@@ -83,7 +76,7 @@ let classify p ps =
   (for i = 1 to 38 do
     (let x = get_category i in
     let p = posterior_probability p ps x in
-    if p >= n then ((c := x);(n := p)) else ())
+    if p >= !n then ((c := x);(n := p)) else ())
   done) in
   !c
 
@@ -95,18 +88,18 @@ let classify p ps =
  *)
 let predict d ps =
   let p = create_point d in
-  let p2 = classify p ps in
-  ((classification p), (classification p2))
+  let pred_c = classify p ps in
+  ((classification p), pred_c)
 
 (**
  * [bayes_predict_all dl ps] tbd
  *)
 let bayes_predict_all dl ps =
-  let _ = (points_cat_tally := tally_cats x) in
-  let _ = (num_points := List.length l) in
+  let _ = (points_cat_tally := tally_cats ps) in
+  let _ = (num_points := List.length ps) in
   let rec loop dl out =
     match dl with
       | h::t -> let id = h.id in
-                loop t (id, (predict h ps))::out
+                loop t ((id, (predict h ps))::out)
       | [] -> [] in
   loop dl []

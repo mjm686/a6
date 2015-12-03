@@ -5,14 +5,14 @@ open Core
  * Represents a 6-dimensional data point from data fields of a given crime.
  *)
 type point = {
-  id: int;
-  date: float;
-  ofDay: float;
-  category: cat;
-  dayOfWeek: day;
-  pdDistrict: string;
-  x: float;
-  y: float
+  ident : int;
+  date : float;
+  ofDay : float;
+  category : cat;
+  dayOfWeek : day;
+  pdDistrict : string;
+  x : float;
+  y : float
 }
 
 (**
@@ -21,6 +21,12 @@ type point = {
 type points = point list
 
 type features = DATE | OFDAY | DAYOFWEEK | X | Y
+
+(**
+ * [create_empty_points()] creates a collection of 0 points
+ *)
+let create_empty_points =
+  []
 
 (**
  * [create_point d] creates an individual 6-dimensional point from the given
@@ -35,7 +41,7 @@ let create_point d =
   let tm = Span.minute (Time.Ofday.to_span_since_start_of_day d.ofDay) in
 
   {
-   id = d.id;
+   ident = d.id;
    date = dt;
    ofDay = tm;
    category = d.category;

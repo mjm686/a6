@@ -1,10 +1,28 @@
 open Core
 open Csv
 
-type data 
+type cat =
+   | ARSON | ASSAULT | BADCHECKS | BRIBERY | BURGLARY | DISORDERLY
+   | DRIVING | DRUG | DRUNK | EMBEZZLE
+ | EXTORTION | FAMILY | FORGERY | FRAUD | GAMBLING
+ | KIDNAPPING | LARCENY | LIQUOR | LOITER | MISSING
+ | NONCRIMINAL | OTHER | PORN | PROSTITUTION
+ | RECOVERED | ROBBERY | RUNAWAY | SECONDARY
+ | SEXOFFENSESF | SEXOFFENSESNF | STOLEN
+ | SUICIDE | SUSPICIOUS | TREA | TRESPASS | VANDALISM | VEHICLE
+ | WARRANTS | WEAPON | UNDETERMINED | UNRECOGNIZED
+type day = | Mon | Tue | Wed | Thur | Fri | Sat | Sun | Unknown
+type data = {
+  id: int;
+  date: Date0.t;
+  ofDay: Time.Ofday.t;
+  category: cat;
+  dayOfWeek: day;
+  pdDistrict: string;
+  x: float;
+  y: float
+}
 type output
-type cat
-type day
 
 exception EOF of data list
 
@@ -15,7 +33,7 @@ val load_file : string -> Csv.in_channel
 
 (** [parse_train] parses the csv training data into data records
  *
- *  [parse_train ic] return [data list] where ic is the in_channel 
+ *  [parse_train ic] return [data list] where ic is the in_channel
  *  returned by load_file on the intended file to read in
  * *)
 val parse_train : Csv.in_channel -> data list

@@ -31,14 +31,14 @@ val likelihood  : point -> points -> cat -> float
  *
  * The proabilitiy is a float from 0.0 to 1.0 inclusive.
  *)
-val posterior_probability  : point -> cat -> float
+val posterior_probability  : point -> points -> cat -> float
 
 (**
  * [classify p ps] classifies a point according to training points ps.
  *
- * It returns a new point of the predicted category.
+ * It returns the predicted category.
  *)
-val classify  : point -> points -> point
+val classify  : point -> points -> cat
 
 (**
  * [predict d ps] predicts the classification of the given d under the training
@@ -50,4 +50,4 @@ val predict  : data -> points -> (cat * cat)
 (**
  * [bayes_predict_all dl ps] tbd
  *)
-val bayes_predict_all : data list -> points -> (int * (cat * cat))
+val bayes_predict_all : data list -> points -> (int * (cat * cat)) list
