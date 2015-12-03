@@ -4,6 +4,7 @@ open Csv
 type data 
 type output
 type cat
+type day
 
 exception EOF of data list
 

@@ -14,6 +14,8 @@ type cat =
  | SUICIDE | SUSPICIOUS | TREA | TRESPASS | VANDALISM | VEHICLE 
  | WARRANTS | WEAPON | UNDETERMINED | UNRECOGNIZED
 
+type day = | Mon | Tue | Wed | Thur | Fri | Sat | Sun | Unknown
+
 type data = {
   id: int;
   date: Date0.t;
@@ -23,8 +25,7 @@ type data = {
   pdDistrict: string;
   x: float;
   y: float 
-} and day = | Mon | Tue | Wed | Thur | Fri | Sat | Sun | Unknown
-
+} 
 type output = int * (cat*float) list
 
 exception BadData

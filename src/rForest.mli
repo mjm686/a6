@@ -62,7 +62,7 @@ float list -> cat list -> tree list
  * The previous makeNodes functions are meant
  * only to be helper functions for [makeNodes].
  *)
-val makeNodes : date list -> int list ->
+val makeNodes : data list -> int list ->
 float list -> float list -> cat list -> tree list
 
 (**
@@ -86,7 +86,7 @@ val hollowForest : unit -> tree list
  * category stored in Leaf t; if t is a Node, leafBool
  * returns false.
  *)
-val leafBool : cat -> tree -> boolean
+val leafBool : cat -> tree -> bool
 
 (**
  * [nodeBool att t] returns a boolean.
@@ -95,7 +95,7 @@ val leafBool : cat -> tree -> boolean
  * attribute stored in Node t; if t is a Leaf,
  * nodeBool returns false.
  *)
-val nodeBool : attr -> tree -> boolean
+val nodeBool : attr -> tree -> bool
 
 (**
  * [nodeListGet n] returns a tree list.
