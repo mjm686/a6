@@ -212,4 +212,5 @@ val updateTree : Parser.data -> tree list -> unit
  *[hollowForest ()]); this forest will then be updated
  * to account for the data in datl.
  *)
-val randomForest : data list -> tree list -> unit
+val randomForest : data list -> tree list 
+-> tree list
