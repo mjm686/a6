@@ -1,5 +1,6 @@
 open Parser
 open RForest
+open Core
 
 let rec getLeafs1 (aY : attr)
 (tl : tree list) : tree list = match tl with
