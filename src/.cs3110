@@ -1,2 +1,2 @@
-compile.opam_packages=async,csv,batteries
+compile.opam_packages=async,csv
 compile.thread=true

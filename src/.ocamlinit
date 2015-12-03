@@ -4,7 +4,6 @@
 #require "core.top"
 #require "core.syntax"
 #require "csv"
-#require "batteries"
 
 #require "core";;
 #require "async";;

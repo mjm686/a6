@@ -1,4 +1,5 @@
-Open Parser
+open Parser
+open Core
 
 (**
  * Represents a 6-dimensional data point from data fields of a given crime.
