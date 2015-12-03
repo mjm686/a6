@@ -43,8 +43,7 @@ let classes =
 ;WARRANTS;WEAPON]
 
 let load_file fname = 
-  let ic = open_in fname in
-  let ic = Csv.of_channel ic in
+  let ic = Csv.of_channel (open_in fname) in
   (* To skip over the first line, which is the field names *)
   let _ = Csv.next ic in
   ic
@@ -197,6 +196,33 @@ let parse_single ?test:(test=false) id ls =
   } in
   d
 
+let parse_test_single ls =
+  let id = int_of_string (List.hd ls) in
+  let time = Time.of_string (List.nth ls 1) in
+  let (date, of_day) = Time.to_date_ofday time (Time.Zone.local) in
+  let day_of_week = parse_day (List.nth ls 2) in
+  let district = List.nth ls 3 in 
+  let x_s = List.nth ls 5 in
+  let y_s = List.nth ls 6 in
+  let x = try float_of_string (String.sub x_s 0 (float_helper x_s)) with
+     | Failure _  -> 0.0
+   in
+  let y = try float_of_string (String.sub y_s 0 (float_helper y_s)) with
+    | Failure _ -> 0.0
+   in
+  let d = {
+    id = id;
+    date = date;
+    ofDay = of_day;
+    category = UNDETERMINED;
+    dayOfWeek = day_of_week;
+    pdDistrict = district;
+    x = x;
+    y = y 
+  } in
+  let _ = printf "%d\n" d.id in
+  d
+
 let parse_fold_single ls =
   let id = int_of_string (List.hd ls) in
   let date = Date0.of_string_iso8601_basic (List.nth ls 1) 0 in
@@ -225,30 +251,32 @@ let compare_data d1 d2 =
   let d2 = cat_to_string d2.category in
   String.compare d1 d2
 
-let counter = ref 0
+let counter1 = ref 0
 let id = ref 0
-let parse ic test = 
+let parse ic = 
   let rec helper (acc: data list) : data list =
-    if !counter >= 100000 then 
-      let _ = counter := 0 in
-      (List.sort compare_data acc) 
+    if !counter1 >= 100000 then 
+      let _ = counter1 := 0 in
+      acc
+      (*(List.sort compare_data acc) *)
     else begin
       let next_ic = try (Csv.next ic) with
         | End_of_file -> 
             Csv.close_in ic; 
-            let acc = List.sort compare_data acc in
+            (*let acc = List.sort compare_data acc in*)
             raise (EOF acc);
         | Csv.Failure (n1,n2,s) ->
            (* if any record fails to be in csv format, skip *) 
             printf "failed at field %d line %d because %s\n" n1 n2 s;
             Csv.next ic in
       id := !id + 1;
-      counter := !counter + 1;
+      counter1 := !counter1 + 1;
       let d = next_ic in
-      helper ((parse_single !id d ~test:test)::acc)
+      helper ((parse_test_single d)::acc)
     end
   in let data = helper [] in
-  List.sort compare_data data
+  (*List.sort compare_data data*)
+  data
 
 let get_next ic acc = 
   try (Csv.next ic) with
@@ -261,8 +289,14 @@ let get_next ic acc =
         printf "failed at field %d line %d because %s\n" n1 n2 s;
         Csv.next ic
 
+let counter2 = ref 0
 let parse_fold ic = 
   let rec helper (acc: data list) : data list =
+    if !counter2 >= 100000 then 
+      let _ = counter2 := 0 in
+      (List.sort compare_data acc) 
+    else
+      let _ = counter2 := !counter2 + 1 in
       let d = try get_next ic acc with
         | EOF acc -> raise (EOF acc) in
       let d = try parse_fold_single d with
@@ -299,7 +333,7 @@ let rec format_output outputs =
   end
 
 (* Functions in mli implemented *)
-let parse_test ic = parse ic true
+let parse_test ic = parse ic
 
 let parse_train ic = parse_fold ic
 
@@ -318,4 +352,17 @@ let data_to_string (d: data) : string list =
   let y = string_of_float d.y in
   [id;date;ofDay;category;day;d.pdDistrict;x;y]
 
+(*let example = [(1,[(ARSON, 0.1);(ASSAULT, 0.57123);(BRIBERY, 0.836324)]);(3, [(TREA, 0.8);(WEAPON, 0.3844514);(OTHER, 0.13)])] in
+write_to "test.csv" example*)
+
+(*let ic = load_file "../data/test.csv" in
+let rec example_parse_test acc =
+  let dl = try parse_test ic with
+  | EOF dl -> 
+      let acc = dl@acc in 
+      let _ = raise (EOF acc) in
+      acc in
+  try example_parse_test dl with
+  | EOF dl -> dl in
+example_parse_test []*)
 
