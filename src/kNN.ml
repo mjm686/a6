@@ -19,6 +19,7 @@ let classify p ps =
   let ps_sub = points_within 1. p ps in
   let l = tally_cats ps_sub in
   let l = List.sort (fun x y -> if snd x > snd y then (-1) else 1) l in
+  if l = [] then UNDETERMINED else
   let x = List.hd l in
   let out = fst x in
   out
