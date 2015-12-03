@@ -44,7 +44,7 @@ val points_within  : float -> point -> points -> points
 (**
  * tbd
  *)
-val points_within_feat  : float -> point -> feature -> points -> points
+val points_within_feat  : float -> point -> features -> points -> points
 
 (**
  * [classification p] returns the category classification of the given point.
