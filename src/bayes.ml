@@ -1,7 +1,7 @@
 open Parser
 open Point
 
-let points_cat_tally = ref (tally_cats (create_empty_points()))
+let points_cat_tally = ref (tally_cats ([]))
 let num_points = ref 0
 
 (**

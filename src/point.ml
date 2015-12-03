@@ -5,14 +5,14 @@ open Core
  * Represents a 6-dimensional data point from data fields of a given crime.
  *)
 type point = {
-  ident : int;
-  date : float;
-  ofDay : float;
-  category : cat;
-  dayOfWeek : day;
-  pdDistrict : string;
-  x : float;
-  y : float
+  idp : int;
+  datep : float;
+  ofDayp : float;
+  categoryp : cat;
+  dayOfWeekp : day;
+  pdDistrictp : string;
+  xp : float;
+  yp : float
 }
 
 (**
@@ -21,12 +21,6 @@ type point = {
 type points = point list
 
 type features = DATE | OFDAY | DAYOFWEEK | X | Y
-
-(**
- * [create_empty_points()] creates a collection of 0 points
- *)
-let create_empty_points =
-  []
 
 (**
  * [create_point d] creates an individual 6-dimensional point from the given
@@ -38,17 +32,17 @@ let create_point d =
   let month = Month.to_int (Date0.month dt) in
   let dt = float_of_int(month * 30 + day) in
 
-  let tm = Span.minute (Time.Ofday.to_span_since_start_of_day d.ofDay) in
+  let tm = Span.to_min (Time.Ofday.to_span_since_start_of_day d.ofDay) in
 
   {
-   ident = d.id;
-   date = dt;
-   ofDay = tm;
-   category = d.category;
-   dayOfWeek = d.dayOfWeek;
-   pdDistrict = d.pdDistrict;
-   x = d.x;
-   y = d.y;
+   idp = d.id;
+   datep = dt;
+   ofDayp = tm;
+   categoryp = d.category;
+   dayOfWeekp = d.dayOfWeek;
+   pdDistrictp = d.pdDistrict;
+   xp = d.x;
+   yp = d.y;
   }
 
 
@@ -59,19 +53,19 @@ let create_points d =
   List.map (fun x -> create_point x) d
 
 let date_distance p1 p2 =
-  p2.date -. p1.date
+  p2.datep -. p1.datep
 
 let ofDay_distance p1 p2 =
-  p2.ofDay -. p1.ofDay
+  p2.ofDayp -. p1.ofDayp
 
 let dayOfWeek_distance p1 p2 =
-  if p1.dayOfWeek = p2.dayOfWeek then 0 else 1
+  if p1.dayOfWeekp = p2.dayOfWeekp then 0. else 1.
 
 let x_distance p1 p2 =
-  p2.x -. p1.x
+  p2.xp -. p1.xp
 
-let x_distance p1 p2 =
-  p2.y -. p1.y
+let y_distance p1 p2 =
+  p2.yp -. p1.yp
 
 (**
  * [distance p1 p2] calculates the Euclidean distance between two points p1
@@ -107,7 +101,7 @@ let points_within_feat k p feat ps =
 (**
  * [classification p] returns the category classification of the given point.
  *)
-let classification p = p.category
+let classification p = p.categoryp
 
 let get_category = function
   | 0 -> ARSON
@@ -194,7 +188,7 @@ let tally_cats ps =
 let num_of_class ps cat =
   let rec loop ps cat i =
     match ps with
-    | h::t -> if (h = cat) then (incr i); loop t cat i
-    | [] -> i in
+    | h::t -> if (h.categoryp = cat) then (incr i); loop t cat i
+    | [] -> !i in
   let i : (int ref) = ref 0 in
   loop ps cat i

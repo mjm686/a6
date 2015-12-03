@@ -5,14 +5,14 @@ open Core
  * Represents a 6-dimensional data point from data fields of a given crime.
  *)
 type point = {
-  ident : int;
-  date : float;
-  ofDay : float;
-  category : cat;
-  dayOfWeek : day;
-  pdDistrict : string;
-  x : float;
-  y : float
+  idp : int;
+  datep : float;
+  ofDayp : float;
+  categoryp : cat;
+  dayOfWeekp : day;
+  pdDistrictp : string;
+  xp : float;
+  yp : float
 }
 
 (**
@@ -24,11 +24,6 @@ type points = point list
  * tbd
  *)
 type features = DATE | OFDAY | DAYOFWEEK | X | Y
-
-(**
- * [create_empty_points()] creates a collection of 0 points
- *)
-val create_empty_points  : unit -> points
 
 (**
  * [create_point d] creates an individual 6-dimensional point from the given
