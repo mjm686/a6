@@ -71,7 +71,7 @@ val getI : tree -> int
 (**
  * [getC lf] returns the value lf.c of Leaf i.
  *)
-val getC : tree -> int
+val getC : tree -> cat
 
 (**
  * [total tl] returns a the total number of crimes
