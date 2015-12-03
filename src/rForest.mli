@@ -62,7 +62,7 @@ float list -> cat list -> tree list
  * The previous makeNodes functions are meant
  * only to be helper functions for [makeNodes].
  *)
-val makeNodes : data list -> int list ->
+val makeNodes : day list -> int list ->
 float list -> float list -> cat list -> tree list
 
 (**
@@ -202,7 +202,7 @@ val yConvert : float -> attr
  * [updateTree dat tl] edits a Leaf, as in [editTree],
  * based on the information stored in data.
  *)
-val updateTree : Parser.data -> tree list -> unit
+val updateTree : data -> tree list -> unit
 
 (**
  * [randomForest datl tl] fills a random forest tl
