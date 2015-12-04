@@ -47,5 +47,5 @@ let kNN_predict_all dl ps =
     match dl with
       | h::t -> let id = h.id in
                 loop t ((id, (predict h ps))::out)
-      | [] -> [] in
+      | [] -> out in
   loop dl []

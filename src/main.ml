@@ -26,13 +26,15 @@ let main train test output =
   | EOF d -> d in
   let _ = printf "Finished parsing testing\n" in
   (*let weights = eval () in*)
-  let _ = finale d test in
 
   let _ = printf "Random Forest Done...\n" in
   let point_training = kNN_train d in
   let _ = printf "KNN Traning Done...Starting classifying...\n" in
-  let kNN_results = kNN_predict_all test (point_training) in
+  let kNN_results = kNN_predict_all test point_training in
+  let _ = printf "%d kNN results\n" (List.length kNN_results) in
   let _ = print_outputs kNN_results in
+
+  let _ = finale d test in
   (*let _ = bayes_predict_all test (point_training) in*)
 
     (*
