@@ -45,7 +45,6 @@ let classes =
 let load_file fname = 
   let ic = Csv.of_channel (open_in fname) in
   (* To skip over the first line, which is the field names *)
-  let _ = Csv.next ic in
   ic
 
 let parse_cat s = 
@@ -90,7 +89,6 @@ let parse_cat s =
   | "WARRANTS" -> WARRANTS
   | "WEAPON LAWS" -> WEAPON
   | _ -> UNRECOGNIZED
-
 
 let parse_day s = 
   match s with
@@ -162,7 +160,7 @@ let print_single d =
   let open Format in
   let format_helper f d =
     fprintf f "%a %a %s %s %s %f %f\n" Date0.pp d.date Time.Ofday.pp d.ofDay (cat_to_string d.category) (day_to_string d.dayOfWeek) d.pdDistrict d.x d.y in
-  printf "Row %d %a" d.id format_helper d
+  printf "Id %d %a" d.id format_helper d
 
 let float_helper s = 
   if String.length s < 12 then String.length s
@@ -365,6 +363,7 @@ let rec example_parse_test acc =
   try example_parse_test dl with
   | EOF dl -> dl in
 example_parse_test []*)
+
 (*let ic = load_file "train_fold1.csv" in
 parse_train ic*)
 

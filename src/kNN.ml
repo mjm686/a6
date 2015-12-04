@@ -44,3 +44,4 @@ let predict d ps =
  *)
 let kNN_predict_all dl ps =
   List.map (fun x -> (x.id, (predict x ps))) dl
+
