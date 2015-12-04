@@ -9,7 +9,7 @@ type fname = string
 
 let rec print_outputs ls =
   match ls with
-  | [] -> ()
+  | [] -> printf "---------------------------------DONE--------------------------------------\n"
   | h::t ->
       let cats = snd h in
       let p = printf "%d correct:%s | predicted:%s\n" in
@@ -27,15 +27,19 @@ let main train test output =
   let _ = printf "Finished parsing testing\n" in
   (*let weights = eval () in*)
 
-  let _ = printf "Random Forest Done...\n" in
   let point_training = kNN_train d in
   let _ = printf "KNN Traning Done...Starting classifying...\n" in
   let kNN_results = kNN_predict_all test point_training in
   let _ = printf "%d kNN results\n" (List.length kNN_results) in
   let _ = print_outputs kNN_results in
 
-  let _ = finale d test in
-  (*let _ = bayes_predict_all test (point_training) in*)
+  (*let rf = finale d test in
+  let _ = printf "Ranfom forest done\n" in
+  let _ = print_outputs rf in*)
+  let bayes = bayes_predict_all test (point_training) in
+  let _ = printf "Bayes done\n" in
+  let _ = print_outputs bayes in
+  let _ = printf "%d Bayes results\n" (List.length bayes) in
 
     (*
    * let rf_result = rf_classify test (rf_train d) in
