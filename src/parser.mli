@@ -31,6 +31,8 @@ exception EOF of data list
  *)
 val load_file : string -> Csv.in_channel
 
+val cat_to_string : cat -> string
+
 (** [parse_train] parses the csv training data into data records
  *
  *  [parse_train ic] return [data list] where ic is the in_channel

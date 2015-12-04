@@ -43,9 +43,4 @@ let predict d ps =
  * [kNN_predict_all dl ps] tbd
  *)
 let kNN_predict_all dl ps =
-  let rec loop dl out =
-    match dl with
-      | h::t -> let id = h.id in
-                loop t ((id, (predict h ps))::out)
-      | [] -> [] in
-  loop dl []
+  List.map (fun x -> (x.id, (predict x ps))) dl

@@ -11,7 +11,7 @@ let main train test output =
   (*let ic_test = load_file test in*)
   let d = try parse_train ic with
   | EOF d -> d in
-  (*let test = try parse_train ic_test with 
+  (*let test = try parse_train ic_test with
   | EOF d -> d in*)
   (*let weights = eval () in*)
 

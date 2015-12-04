@@ -15,6 +15,8 @@ type point = {
   yp : float
 }
 
+type opt_test = point ref list * point ref list * point ref list * point ref list * point ref list
+
 (**
  * Represents an entire collection of data points, forming the whole graph.
  *)
@@ -36,6 +38,8 @@ val create_point  : data -> point
  *)
 val create_points  : data list -> points
 
+val optimize_test : points -> opt_test
+
 (**
  * [distance p1 p2] calculates the Euclidean distance between two points p1
  * and p2.
@@ -43,7 +47,7 @@ val create_points  : data list -> points
 val distance  : point -> point -> float
 
 (**
- * [points_within k p ps] returns a list of points within the given distance.
+ * [points_within k p ps ot] returns a list of points within the given distance.
  *
  * For point p within a field of points ps, returns the points that fall
  * within the given distance.
@@ -53,7 +57,7 @@ val points_within  : float -> point -> points -> points
 (**
  * tbd
  *)
-val points_within_feat  : float -> point -> features -> points -> points
+val points_within_feat  : float -> point -> features -> points -> opt_test -> points
 
 (**
  * [classification p] returns the category classification of the given point.
@@ -74,6 +78,8 @@ val get_number : cat -> int
  * tbd
  *)
 val tally_cats : points -> (cat * int) list
+
+val print_temp : (int * (cat * cat)) list -> string
 
 (**
  * [num_of_class ps cat] returns the number of points of the given category

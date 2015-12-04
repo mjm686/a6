@@ -15,6 +15,8 @@ type point = {
   yp : float
 }
 
+type opt_test = point ref list * point ref list * point ref list * point ref list * point ref list
+
 (**
  * Represents an entire collection of data points, forming the whole graph.
  *)
@@ -52,6 +54,25 @@ let create_point d =
 let create_points d =
   List.map (fun x -> create_point x) d
 
+let optimize_test ps =
+  let ps = List.sort (fun x y -> if x.datep > y.datep then (1) else (-1)) ps in
+  let d = List.map (fun x -> ref x) ps in
+
+  let ps = List.sort (fun x y -> if x.ofDayp > y.ofDayp then (1) else (-1)) ps in
+  let t = List.map (fun x -> ref x) ps in
+
+  let ps = List.sort (fun x y -> if x.dayOfWeekp > y.dayOfWeekp then (1) else (-1)) ps in
+  let w = List.map (fun x -> ref x) ps in
+
+  let ps = List.sort (fun x y -> if x.xp > y.xp then (1) else (-1)) ps in
+  let x = List.map (fun x -> ref x) ps in
+
+  let ps = List.sort (fun x y -> if x.yp > y.yp then (1) else (-1)) ps in
+  let y = List.map (fun x -> ref x) ps in
+
+  (d,t,w,x,y)
+
+
 let date_distance p1 p2 =
   p2.datep -. p1.datep
 
@@ -87,10 +108,10 @@ let distance p1 p2 =
  * For point p within a field of points ps, returns a list of points that fall
  * within the given distance.
  *)
-let points_within  k p ps =
+let points_within k p ps =
   List.filter (fun x -> (distance p x) <= k) ps
 
-let points_within_feat k p feat ps =
+let points_within_feat k p feat ps ot =
   match feat with
   | DATE -> List.filter (fun x -> (date_distance p x) <= k) ps
   | OFDAY -> List.filter (fun x -> (ofDay_distance p x) <= k) ps
@@ -177,9 +198,15 @@ let tally_cats ps =
     match c_list with
       | h::t -> (incr (List.assoc (get_number h) n_list));
                 loop t n_list
-      | [] -> [] in
+      | [] -> n_list in
   let out = loop c_list n_list in
   List.map (fun x -> (get_category(fst x), !(snd x))) out
+
+let print_temp x =
+  match x with
+  | h::t -> (string_of_int (fst h))^"  "^(cat_to_string(fst (snd h)))^", "^
+            (cat_to_string(snd (snd h)))
+  | [] -> ""
 
 (**
  * [num_of_class ps cat] returns the number of points of the given category

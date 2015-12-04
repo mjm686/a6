@@ -4,6 +4,8 @@ open Point
 let points_cat_tally = ref (tally_cats ([]))
 let num_points = ref 0
 
+let ot = ref ([],[],[],[],[])
+
 (**
  * [bayes_train l] takes in training data and outputs the collection of points that
  * result.
@@ -32,23 +34,23 @@ let prior_probability ps cat =
 let likelihood p ps cat =
   let t_num = float_of_int (List.assoc cat (!points_cat_tally)) in
 
-  let s = points_within_feat 5. p DATE ps in
+  let s = points_within_feat 5. p DATE ps !ot in
   let s_num = float_of_int (List.length s) in
   let date_p = s_num /. t_num in
 
-  let s = points_within_feat 30. p OFDAY ps in
+  let s = points_within_feat 30. p OFDAY ps !ot in
   let s_num = float_of_int (List.length s) in
   let ofDay_p = s_num /. t_num in
 
-  let s = points_within_feat 0.5 p DAYOFWEEK ps in
+  let s = points_within_feat 0.5 p DAYOFWEEK ps !ot in
   let s_num = float_of_int (List.length s) in
   let dayOfWeek_p = s_num /. t_num in
 
-  let s = points_within_feat 0.005 p X ps in
+  let s = points_within_feat 0.005 p X ps !ot in
   let s_num = float_of_int (List.length s) in
   let x_p = s_num /. t_num in
 
-  let s = points_within_feat 0.005 p Y ps in
+  let s = points_within_feat 0.005 p Y ps !ot in
   let s_num = float_of_int (List.length s) in
   let y_p = s_num /. t_num in
 
@@ -97,6 +99,9 @@ let predict d ps =
 let bayes_predict_all dl ps =
   let _ = (points_cat_tally := tally_cats ps) in
   let _ = (num_points := List.length ps) in
+
+  let _ = ot := Point.optimize_test ps in
+
   let rec loop dl out =
     match dl with
       | h::t -> let id = h.id in
