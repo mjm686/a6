@@ -242,7 +242,7 @@ let parse_fold_single ls =
     x = x;
     y = y 
   } in
-  Some d
+  d
 
 let compare_data d1 d2 =
   let d1 = cat_to_string d1.category in
@@ -290,18 +290,15 @@ let get_next ic acc =
 let counter2 = ref 0
 let parse_fold ic = 
   let rec helper (acc: data list) : data list =
-    if !counter2 >= 10000 then 
+    if !counter2 >= 100000 then 
       let _ = counter2 := 0 in
       (List.sort compare_data acc) 
     else
       let _ = counter2 := !counter2 + 1 in
       let d = try get_next ic acc with
         | EOF acc -> raise (EOF acc) in
-      let d = try parse_fold_single d with
-        | BadData -> None in
-      match d with 
-        | None -> helper acc
-        | Some d -> helper (d::acc) in
+      let d = parse_fold_single d in
+      helper (d::acc) in
   let data = helper [] in
   List.sort compare_data data
 
@@ -333,7 +330,10 @@ let rec format_output outputs =
 (* Functions in mli implemented *)
 let parse_test ic = parse ic
 
-let parse_train ic = parse_fold ic
+let parse_train ic = 
+  let d = parse_fold ic in
+  let _ = printf "parsed %d records\n" (List.length d) in
+  d
 
 let write_to fname csv = 
   let csv = format_output csv in
@@ -367,7 +367,7 @@ example_parse_test []*)
 (*let ic = load_file "train_fold1.csv" in
 parse_train ic*)
 
-let ic = load_file "train_fold2.csv" in
+(*let ic = load_file "train_fold2.csv" in
 let rec example_parse_train acc =
   let dl = try parse_fold ic with
   | EOF dl -> 
@@ -376,5 +376,5 @@ let rec example_parse_train acc =
       acc in
   try example_parse_train dl with
   | EOF dl -> dl in
-example_parse_train []
+example_parse_train []*)
 

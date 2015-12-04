@@ -16,7 +16,7 @@ let kNN_train l =
  *)
 let classify p ps =
 
-  let ps_sub = points_within 1. p ps in
+  let ps_sub = points_within 8. p ps in
   let l = tally_cats ps_sub in
   let l = List.sort (fun x y -> if snd x > snd y then (-1) else 1) l in
   if l = [] then UNDETERMINED else

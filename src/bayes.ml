@@ -105,6 +105,7 @@ let bayes_predict_all dl ps =
   let rec loop dl out =
     match dl with
       | h::t -> let id = h.id in
+                let _ = Printf.printf "%d\n" id in
                 loop t ((id, (predict h ps))::out)
       | [] -> out in
   loop dl []
