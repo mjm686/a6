@@ -188,19 +188,19 @@ val ofDayToTime : Time.Ofday.t -> attr
 
 (**
  * [xConvert fl] creates an X attribute from a
- * float.
+ * float fl. fl should represent a longitude.
  *)
 val xConvert : float -> attr
 
 (**
  * [yConvert fl] creates a Y attribute from a
- * float.
+ * float fl. fl should represent a latitude.
  *)
 val yConvert : float -> attr
 
 (**
  * [updateTree dat tl] edits a Leaf, as in [editTree],
- * based on the information stored in data.
+ * based on the information stored in data dat.
  *)
 val updateTree : data -> tree list -> unit
 
