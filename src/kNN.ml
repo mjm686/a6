@@ -17,10 +17,12 @@ let i = ref 1
  * It returns the predicted category.
  *)
 let classify p ps =
-
-  let _ = print_endline(string_of_int(!i)) in
+  
+  let _ = 
+    if (!i mod 1000) = 0 then print_endline(string_of_int(!i))
+    else () in
   let _ = incr i in
-  let ps_sub = points_within 3. p ps in
+  let ps_sub = points_within 5. p ps in
   let l = tally_cats ps_sub in
   let l = List.sort (fun x y -> if snd x > snd y then (-1) else 1) l in
   if l = [] then UNDETERMINED else
@@ -41,12 +43,14 @@ let classify p ps =
 let predict d ps =
   let p = create_point d in
   let c_pred = classify p ps in
-  let _ = print_endline (cat_to_string(classification p)^","^cat_to_string(c_pred)) in
   ((classification p), c_pred)
 
 (**
  * [kNN_predict_all dl ps] tbd
  *)
 let kNN_predict_all dl ps =
-  List.map (fun x -> (x.id, (predict x ps))) dl
+  let l =  List.map (fun x -> (x.id, (predict x ps))) dl in
+  let _ = Printf.printf "kNN takes in %d records\n" (List.length dl) in
+  l
+
 

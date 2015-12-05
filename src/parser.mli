@@ -22,7 +22,9 @@ type data = {
   x: float;
   y: float
 }
+type algo = | KNN | RF | Bayes
 type output
+type eval_out = (int * (cat*cat)) list
 
 exception EOF of data list
 

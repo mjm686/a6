@@ -17,4 +17,6 @@ let cross_valid () =
     | End -> () in
   helper ic 
 
-let eval () = failwith "TODO"
+let eval (rf: eval_out) (knn: eval_out) (bayes: eval_out) : weights =
+ exp_eval rf knn bayes 
+

@@ -4,12 +4,13 @@ open Bayes
 open ClassifierEval
 open RandomForest
 open Printf
+open ExpGradient
 
 type fname = string
 
 let rec print_outputs ls =
   match ls with
-  | [] -> printf "---------------------------------DONE--------------------------------------\n"
+  | [] -> printf "++++++++++++++++++++++++++++++++++++++++++++++++++\n"
   | h::t ->
       let cats = snd h in
       let p = printf "%d correct:%s | predicted:%s%!\n" in
@@ -32,7 +33,7 @@ let main train test output =
   let test = try parse_train ic_test with
   | EOF d -> d in
   let _ = printf "Finished parsing testing\n" in
-  (*let weights = eval () in*)
+  
 
   let point_training = kNN_train dl in
   let _ = printf "KNN Traning Done...Starting classifying...\n" in
@@ -43,6 +44,8 @@ let main train test output =
   let _ = printf "Ranfom forest done on %d records with %d training\n" (List.length test) (List.length dl) in
   let _ = printf "Random forest accuracy: %f%% \n" (accuracy rf) in
   let _ = printf "kNN accuracy: %f%% \n" (accuracy kNN_results) in
+  let weights = eval rf kNN_results [] in
+  let _ = print_weights weights in
   (*let bayes = bayes_predict_all test (point_training) in
   let _ = printf "Bayes done\n" in
   (*let _ = print_outputs bayes in*)
@@ -54,4 +57,4 @@ let main train test output =
    * *)
   ()
 
-let () = main "train_fold2.csv" "test_fold2.csv" ""
+let () = main "../data/train_1.csv" "../data/test_1.csv" ""
