@@ -109,7 +109,7 @@ let predict (dat : data) (tl : tree list)
   ((dat.id), (dat.category,
     (predictCat dat tl)))
 
-let counter = ref 0 
+let counter = ref 1 
 let rec predictions (datlist : data list)
 (tl : tree list)
 : (int * (cat * cat)) list =
@@ -128,5 +128,5 @@ let finale (train : data list)
 : (int * (cat * cat)) list =
   let results = predictions test
   (randomForest train (hollowForest ())) in
-  counter := 0;
+  counter := 1;
   results

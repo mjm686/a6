@@ -1,16 +1,17 @@
 open Core
 open Csv
 
-type cat =
-   | ARSON | ASSAULT | BADCHECKS | BRIBERY | BURGLARY | DISORDERLY
+type cat = 
+   | ARSON | ASSAULT | BADCHECKS | BRIBERY | BURGLARY | DISORDERLY 
    | DRIVING | DRUG | DRUNK | EMBEZZLE
- | EXTORTION | FAMILY | FORGERY | FRAUD | GAMBLING
- | KIDNAPPING | LARCENY | LIQUOR | LOITER | MISSING
- | NONCRIMINAL | OTHER | PORN | PROSTITUTION
+ | EXTORTION | FAMILY | FORGERY | FRAUD | GAMBLING 
+ | KIDNAPPING | LARCENY | LIQUOR | LOITER | MISSING 
+ | NONCRIMINAL | OTHER | PORN | PROSTITUTION 
  | RECOVERED | ROBBERY | RUNAWAY | SECONDARY
  | SEXOFFENSESF | SEXOFFENSESNF | STOLEN
- | SUICIDE | SUSPICIOUS | TREA | TRESPASS | VANDALISM | VEHICLE
+ | SUICIDE | SUSPICIOUS | TREA | TRESPASS | VANDALISM | VEHICLE 
  | WARRANTS | WEAPON | UNDETERMINED | UNRECOGNIZED
+type algo = | KNN | RF | Bayes
 type day = | Mon | Tue | Wed | Thur | Fri | Sat | Sun | Unknown
 type data = {
   id: int;
@@ -20,11 +21,11 @@ type data = {
   dayOfWeek: day;
   pdDistrict: string;
   x: float;
-  y: float
-}
-type algo = | KNN | RF | Bayes
+  y: float 
+} 
+
 type output = int * (cat * float) list
-type eval_out = (int * (cat*cat)) list
+type eval_out = (int * (cat * cat)) list
 
 exception EOF of data list
 

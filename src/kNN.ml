@@ -52,7 +52,7 @@ let predict d ps =
  *)
 let kNN_predict_all dl ps =
   let results = List.map (fun x -> (x.id, (predict x ps))) dl in
-  i := 0;
+  i := 1;
   results
 
 

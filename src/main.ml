@@ -54,9 +54,9 @@ let print_accuracies results =
   let bayes = accuracy results.bayes in
   let knn = accuracy results.knn in 
   let _ = printf "-------------ACCURACIES-------------\n" in
-  let _ = printf "| Random forest accuracy: %f%%     |\n" (rf) in
-  let _ = printf "| kNN accuracy: %f%%               |\n" (knn) in
-  let _ = printf "| Bayes accuracy: %f%%             |\n" (bayes) in
+  let _ = printf "| Random forest accuracy: %f%%|\n" (rf) in
+  let _ = printf "| kNN accuracy: %f%%          |\n" (knn) in
+  let _ = printf "| Bayes accuracy: %f%%        |\n" (bayes) in
   printf "-------------ACCURACIES-------------\n"
 
 (* Main function that runs the entire system and then writes the final outputs
@@ -78,19 +78,19 @@ let print_accuracies results =
  * [eval_test]".
  *
  * *)
-let main n train test eval_train eval_test output =
+let main n ftrain ftest eval_train eval_test output =
   (* Starts timer *)
-  let _ = printf "##############################################\n" in
+  let _ = printf "-----------------------------------------------------\n" in
   let start = Time.now () in
 
   (* Loads [train] into stdin and parses the training data *)
-  let ic = load_file train in
+  let ic = load_file ftrain in
   let dl = try parse_train ic n with
   | EOF d -> d in
   let _ = printf "Parsed %d traning data...\n" (List.length dl) in
 
   (* Loads [test] into stdin and parses the testing data *)
-  let ic_test = load_file test in
+  let ic_test = load_file ftest in
   let test = try parse_test ic_test n with
   | EOF d -> d in
   let _ = printf "Parsed %d testing data...\n" (List.length test) in
@@ -118,12 +118,15 @@ let main n train test eval_train eval_test output =
   
   (* Train with the training data and classify the testing data and assign 
    * probabilities to each algorithm's output. Finally, write to [output]*)
+  let _ = printf "Finished classifier evaluation!\n" in
+  let _ = printf "****************************************************\n" in
+  let _ = printf "NOW CLASSIFYING %s WITH %s AS TRAINING SET..." ftest ftrain in
   let results = classify dl test in
   let partial = combine_results (List.rev results.rf) (List.rev results.knn) in
   let results = partial results.bayes weights in
 
   let endTime = Time.now () in
-  let _ = printf "####################################################\n" in
+  let _ = printf "----------------------------------------------------\n" in
   (* Print out total time elapsed *)
   let _ = print_endline (Time.Span.to_string (Time.diff endTime start)) in
   write_to output results
