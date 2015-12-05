@@ -22,7 +22,7 @@ let classify p ps =
     if (!i mod 1000) = 0 then print_endline ("kNN"^(string_of_int(!i)))
     else () in
   let _ = incr i in
-  let ps_sub = points_within 5. p ps in
+  let ps_sub = points_within 8. p ps in
   let l = tally_cats ps_sub in
   let l = List.sort (fun x y -> if snd x > snd y then (-1) else 1) l in
   if l = [] then UNDETERMINED else

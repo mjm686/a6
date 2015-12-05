@@ -40,8 +40,6 @@ let main train test output =
   let point_training = kNN_train dl in
   let _ = printf "KNN Traning Done...Starting classifying...\n" in
 
-  let _ = bayes_predict_all test (point_training) in
-
   let kNN_results = kNN_predict_all test point_training in
   let _ = printf "%d kNN results\n" (List.length kNN_results) in
 
