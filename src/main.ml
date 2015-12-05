@@ -120,7 +120,7 @@ let main n ftrain ftest eval_train eval_test output =
    * probabilities to each algorithm's output. Finally, write to [output]*)
   let _ = printf "Finished classifier evaluation!\n" in
   let _ = printf "****************************************************\n" in
-  let _ = printf "NOW CLASSIFYING %s WITH %s AS TRAINING SET..." ftest ftrain in
+  let _ = printf "NOW CLASSIFYING %s WITH %s AS TRAINING SET...\n" ftest ftrain in
   let results = classify dl test in
   let partial = combine_results (List.rev results.rf) (List.rev results.knn) in
   let results = partial results.bayes weights in
@@ -132,4 +132,5 @@ let main n ftrain ftest eval_train eval_test output =
   write_to output results
 
 (* The function call that runs the project *)
-let () = main 3000 "../data/train.csv" "../data/test.csv" "../data/train_1.csv" "../data/test_1.csv" "test_output.csv"
+(* let () = main 100000 "../data/train.csv" "../data/test.csv" "../data/train_1.csv" "../data/test_1.csv" "output.csv"*)
+let () = main 1000 "../data/sample_train.csv" "../data/sample_test.csv" "../data/train_1.csv" "../data/test_1.csv" ".../data/sample_output.csv"
