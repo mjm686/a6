@@ -4,4 +4,4 @@ type fname
  * [first fname] and testing data from [second fname] and writes the results
  * to [third fname] in csv format.
  *)
-val main: fname -> fname -> fname -> unit
+val main: int -> fname -> fname -> fname -> fname -> fname -> unit

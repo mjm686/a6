@@ -1,6 +1,7 @@
 open Parser
 open RForest
 open Core
+open Printf
 
 let rec getLeafs1 (aY : attr)
 (tl : tree list) : tree list = match tl with
@@ -108,13 +109,19 @@ let predict (dat : data) (tl : tree list)
   ((dat.id), (dat.category,
     (predictCat dat tl)))
 
+let counter = ref 0 
 let rec predictions (datlist : data list)
 (tl : tree list)
 : (int * (cat * cat)) list =
+  let _ = 
+    if !counter mod 1000 = 0 
+    then printf "Random forest has classified %d data points...\n" !counter
+    else () in
   match datlist with
   |[] -> []
   |h::t ->
-  (predict h tl)::(predictions t tl);;
+      incr counter;
+    (predict h tl)::(predictions t tl);;
 
 let finale (train : data list)
 (test : data list)

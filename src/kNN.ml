@@ -19,7 +19,9 @@ let i = ref 1
 let classify p ps =
   
   let _ = 
-    if (!i mod 1000) = 0 then print_endline ("kNN"^(string_of_int(!i)))
+    if (!i mod 1000) = 0 then 
+      let i = string_of_int(!i) in
+      print_endline ("kNN has classified "^(i)^" data points...")
     else () in
   let _ = incr i in
   let ps_sub = points_within 8. p ps in
@@ -49,8 +51,6 @@ let predict d ps =
  * [kNN_predict_all dl ps] tbd
  *)
 let kNN_predict_all dl ps =
-  let l =  List.map (fun x -> (x.id, (predict x ps))) dl in
-  let _ = Printf.printf "kNN takes in %d records\n" (List.length dl) in
-  l
+  List.map (fun x -> (x.id, (predict x ps))) dl
 
 
