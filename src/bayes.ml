@@ -1,7 +1,18 @@
 open Parser
 open Point
 
+(**
+ * Reference for the tallied amounts of each category in the list of training
+ * points, represented by a list of tuples, one for each category, with
+ * the first component of each tuple being the category, and the second
+ * component being the number of training points of that cateogry in the points
+ * ps.
+ *)
 let points_cat_tally = ref (tally_cats ([]))
+
+(**
+ * Reference for number of training points.
+ *)
 let num_points = ref 0
 
 (**
@@ -49,13 +60,11 @@ let likelihood p ps cat =
   let x_p = ss_num /. t_num in
 
   let s = points_within_feat 0.005 p Y ps in
-  (*let _ = (print_endline(cat_to_string(cat)^", "^string_of_float(t_num))) in
-  let _ = print_endline(string_of_int(num_of_class s LOITER)) in*)
   let ss_num = float_of_int (num_of_class s cat) in
   let y_p = ss_num /. t_num in
 
   let out = date_p *. ofDay_p *. dayOfWeek_p *. x_p *. y_p in
-  (*(print_endline(cat_to_string(cat)^", "^string_of_float(out)));*)out
+  out
 
 
 (**
