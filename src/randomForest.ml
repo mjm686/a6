@@ -126,5 +126,7 @@ let rec predictions (datlist : data list)
 let finale (train : data list)
 (test : data list)
 : (int * (cat * cat)) list =
-  predictions test
-  (randomForest train (hollowForest ()));;
+  let results = predictions test
+  (randomForest train (hollowForest ())) in
+  counter := 0;
+  results

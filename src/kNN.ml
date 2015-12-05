@@ -51,6 +51,8 @@ let predict d ps =
  * [kNN_predict_all dl ps] tbd
  *)
 let kNN_predict_all dl ps =
-  List.map (fun x -> (x.id, (predict x ps))) dl
+  let results = List.map (fun x -> (x.id, (predict x ps))) dl in
+  i := 0;
+  results
 
 

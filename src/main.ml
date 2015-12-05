@@ -61,7 +61,10 @@ let print_accuracies results =
 
 (* Main function that runs the entire system and then writes the final outputs
  * to a .csv file.
- *
+ * 
+ * [n] maximal number of data points we intend to have from each file, if
+ * a file has less than [n] records, m, the parser just goes through the file
+ * and returns all the data points in there.
  * [train] the filename of the training set, should be "../data/train.csv".
  * [test] the filename of the testing set, should be "../data/test.csv".
  * [eval_train] the filename of the shuffled training set obtained from 

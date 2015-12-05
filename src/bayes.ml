@@ -121,4 +121,6 @@ let bayes_predict_all dl ps =
       | h::t -> let id = h.id in
                 loop t ((id, (predict h ps))::out)
       | [] -> out in
-  loop dl []
+  let results = loop dl [] in
+  i := 0;
+  results
