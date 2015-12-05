@@ -23,6 +23,7 @@ let accuracy outputs =
     let cats = snd i in
     fst cats = (snd cats)) outputs in
   ((float_of_int (List.length correct)) /. (float_of_int (List.length outputs))) *. 100.0
+  
 
 let main train test output =
   let _ = printf "##############################################\n" in
@@ -33,7 +34,7 @@ let main train test output =
   let _ = printf "Finished parsing traning\n" in
 
   let ic_test = load_file test in
-  let test = try parse_train ic_test with
+  let test = try parse_test ic_test with
   | EOF d -> d in
   let _ = printf "Finished parsing testing\n" in
 
@@ -49,16 +50,13 @@ let main train test output =
   let bayes = bayes_predict_all test (point_training) in
   let _ = printf "***Bayes done***\n" in
   let _ = printf "Bayes accuracy: %f%% \n" (accuracy bayes) in
-  let weights = eval rf kNN_results bayes in
-  let _ = print_weights weights in
+  (*let weights = eval rf kNN_results bayes in
+  let _ = print_weights weights in*)
   let endTime = Time.now () in
   let _ = printf "####################################################\n" in
   let _ = print_endline (Time.Span.to_string (Time.diff endTime start)) in
-  
-  (*
-   * let rf_result = rf_classify test (rf_train d) in
-   * write_output output (results) weights;)
-   * *)
-  ()
+  let weights = default () in
+  let results = combine_results (List.rev rf) (List.rev kNN_results) bayes weights in
+  write_to output (results)
 
-let () = main "../data/train_1.csv" "../data/test_1.csv" ""
+let () = main "../data/train.csv" "../data/test.csv" "test_output.csv"

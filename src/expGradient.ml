@@ -16,6 +16,9 @@ let init () =
   let weight = 1.0 /. 3.0 in
   {knn=weight;rf=weight;bayes=weight}
 
+let default () = 
+  {knn=0.654308;rf=0.226513;bayes=0.119179} 
+
 let normalize w = 
   let total = w.knn +. w.rf +. w.bayes in
   w.knn <- (w.knn /. total);
@@ -64,4 +67,10 @@ let exp_eval (rf:eval_out) (knn:eval_out) (bayes:eval_out) : weights =
 let print_weights (w: weights) : unit = 
   Printf.printf "*** Weights: knn:%f | rf:%f | bayes:%f | ***\n" w.knn w.rf w.bayes
 
+let rec combine_results rf knn bayes w = 
+  match rf, knn, bayes with
+  | h1::t1, h2::t2, h3::t3 ->
+      ((fst h1), [(snd (snd h1), w.rf);(snd (snd h2), w.knn);(snd (snd h3), w.bayes)])::(combine_results t1 t2 t3 w)
+  | [], [], [] -> []
+  | _ -> failwith "Bad data output"
 

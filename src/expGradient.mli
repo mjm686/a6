@@ -13,6 +13,8 @@ type weights
  * *)
 val init : unit -> weights
 
+val default : unit -> weights
+
 (** [adjust] tweeks the [weights] of algorithms based on the [prediction] given
  *  [param] is just a constant that can be modified in the EG algoirthm that
  *  we might need when we are dealing with the entire system's performance
@@ -23,4 +25,6 @@ val adjust : prediction -> weights -> float -> unit
 
 val exp_eval: eval_out -> eval_out -> eval_out -> weights
 
-val print_weights: weights -> unit 
+val print_weights: weights -> unit
+
+val combine_results: eval_out -> eval_out -> eval_out -> weights -> output list

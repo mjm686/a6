@@ -291,7 +291,7 @@ let get_next ic acc =
 let counter2 = ref 0
 let parse_fold ic = 
   let rec helper (acc: data list) : data list =
-    if !counter2 >= 10000 then 
+    if !counter2 >= 100000 then 
       let _ = counter2 := 0 in
       (List.sort compare_data acc) 
     else
