@@ -6,7 +6,7 @@ open Point
  * result.
  *)
 let kNN_train l =
-  create_points l
+  create_points l true
 
 
 let i = ref 1
@@ -39,7 +39,7 @@ let classify p ps =
  * distances.
  *)
 let predict d ps =
-  let p = create_point d in
+  let p = create_point d false in
   let c_pred = classify p ps in
   let _ = print_endline (cat_to_string(classification p)^","^cat_to_string(c_pred)) in
   ((classification p), c_pred)

@@ -12,10 +12,15 @@ type point = {
   dayOfWeekp : day;
   pdDistrictp : string;
   xp : float;
-  yp : float
+  yp : float;
+  training : bool
 }
 
-type opt_test = point ref list * point ref list * point ref list * point ref list * point ref list
+type opt_test = (((int * (point ref)) list) * ((int * (point ref)) list)) *
+                (((int * (point ref)) list) * ((int * (point ref)) list)) *
+                (((int * (point ref)) list) * ((int * (point ref)) list)) *
+                (((int * (point ref)) list) * ((int * (point ref)) list)) *
+                (((int * (point ref)) list) * ((int * (point ref)) list))
 
 (**
  * Represents an entire collection of data points, forming the whole graph.
@@ -28,15 +33,15 @@ type points = point list
 type features = DATE | OFDAY | DAYOFWEEK | X | Y
 
 (**
- * [create_point d] creates an individual 6-dimensional point from the given
+ * [create_point d t] creates an individual 6-dimensional point from the given
  *  data.
  *)
-val create_point  : data -> point
+val create_point  : data -> bool -> point
 
 (**
  * [create_points d] creates a collection of points from the given data list d.
  *)
-val create_points  : data list -> points
+val create_points  : data list -> bool -> points
 
 val optimize_test : points -> opt_test
 

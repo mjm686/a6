@@ -16,8 +16,8 @@ let rec print_outputs ls =
       p (fst h) (cat_to_string (fst cats)) (cat_to_string (snd cats));
       print_outputs t
 
-let accuracy outputs = 
-  let correct = List.filter (fun i -> 
+let accuracy outputs =
+  let correct = List.filter (fun i ->
     let cats = snd i in
     fst cats = (snd cats)) outputs in
   ((float_of_int (List.length correct)) /. (float_of_int (List.length outputs))) *. 100.0
@@ -36,6 +36,8 @@ let main train test output =
 
   let point_training = kNN_train dl in
   let _ = printf "KNN Traning Done...Starting classifying...\n" in
+
+  let _ = bayes_predict_all test (point_training) in
   let kNN_results = kNN_predict_all test point_training in
   let _ = printf "%d kNN results\n" (List.length kNN_results) in
 
@@ -54,4 +56,4 @@ let main train test output =
    * *)
   ()
 
-let () = main "train_fold2.csv" "test_fold2.csv" ""
+let () = main "sample_train.csv" "sample_test.csv" ""

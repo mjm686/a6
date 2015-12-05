@@ -4,14 +4,14 @@ open Point
 let points_cat_tally = ref (tally_cats ([]))
 let num_points = ref 0
 
-let ot = ref ([],[],[],[],[])
+let ot = ref (([],[]),([],[]),([],[]),([],[]),([],[]))
 
 (**
  * [bayes_train l] takes in training data and outputs the collection of points that
  * result.
  *)
 let bayes_train l =
-  create_points l
+  create_points l true
 
 (**
  * [prior_probability ps cat] returns the prior probability of any point in ps
@@ -66,12 +66,16 @@ let likelihood p ps cat =
 let posterior_probability p ps cat =
   (prior_probability ps cat) *. (likelihood p ps cat)
 
+let i = ref 1
+
 (**
  * [classify p ps] classifies a point according to training points ps.
  *
  * It returns the predicted category.
  *)
 let classify p ps =
+  let _ = print_endline(string_of_int(!i)) in
+  let _ = incr i in
   let c = ref UNDETERMINED in
   let n = ref 0. in
   let _ =
@@ -89,9 +93,10 @@ let classify p ps =
  *
  *)
 let predict d ps =
-  let p = create_point d in
-  let pred_c = classify p ps in
-  ((classification p), pred_c)
+  let p = create_point d false in
+  let c_pred = classify p ps in
+  let _ = print_endline (cat_to_string(classification p)^","^cat_to_string(c_pred)) in
+  ((classification p), c_pred)
 
 (**
  * [bayes_predict_all dl ps] tbd
@@ -99,6 +104,9 @@ let predict d ps =
 let bayes_predict_all dl ps =
   let _ = (points_cat_tally := tally_cats ps) in
   let _ = (num_points := List.length ps) in
+
+  let testing_points = create_points dl true in
+  let ps = ps@testing_points in
 
   let _ = ot := Point.optimize_test ps in
 
