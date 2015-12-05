@@ -17,9 +17,9 @@ let i = ref 1
  * It returns the predicted category.
  *)
 let classify p ps =
-  
-  let _ = 
-    if (!i mod 1000) = 0 then 
+
+  let _ =
+    if (!i mod 1000) = 0 then
       let i = string_of_int(!i) in
       print_endline ("kNN has classified "^(i)^" data points...")
     else () in
@@ -35,12 +35,8 @@ let classify p ps =
 
 (**
  * [predict d ps] predicts the classification of the given d under the training
- * points ps, and then returns a tuple of the correct category with the
+ * points ps, and then returns a tuple of the correct category followed by the
  * predicted category.
- *
- * Note the prediction relies heavily on the choice of distance used in the
- * algorithm, as well as the method of classifying categorical variable
- * distances.
  *)
 let predict d ps =
   let p = create_point d false in
@@ -48,7 +44,9 @@ let predict d ps =
   ((classification p), c_pred)
 
 (**
- * [kNN_predict_all dl ps] tbd
+ * [kNN_predict_all dl ps] predicts the classifications of the given data list
+ * dl under the training points ps, and then returns a list of tuples of the
+ * correct categories followed by the predicted categories.
  *)
 let kNN_predict_all dl ps =
   let results = List.map (fun x -> (x.id, (predict x ps))) dl in

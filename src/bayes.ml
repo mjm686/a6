@@ -1,10 +1,19 @@
 open Parser
 open Point
 
+(**
+ * Reference for the tallied amounts of each category in the list of training
+ * points, represented by a list of tuples, one for each category, with
+ * the first component of each tuple being the category, and the second
+ * component being the number of training points of that cateogry in the points
+ * ps.
+ *)
 let points_cat_tally = ref (tally_cats ([]))
-let num_points = ref 0
 
-let ot = ref (([],[]),([],[]),([],[]),([],[]),([],[]))
+(**
+ * Reference for number of training points.
+ *)
+let num_points = ref 0
 
 (**
  * [bayes_train l] takes in training data and outputs the collection of points that
@@ -34,30 +43,28 @@ let prior_probability ps cat =
 let likelihood p ps cat =
   let t_num = float_of_int (List.assoc cat (!points_cat_tally)) in
 
-  let s = points_within_feat 5. p DATE ps !ot in
+  let s = points_within_feat 10. p DATE ps in
   let ss_num = float_of_int (num_of_class s cat) in
   let date_p = ss_num /. t_num in
 
-  let s = points_within_feat 30. p OFDAY ps !ot in
+  let s = points_within_feat 30. p OFDAY ps in
   let ss_num = float_of_int (num_of_class s cat) in
   let ofDay_p = ss_num /. t_num in
 
-  let s = points_within_feat 0.5 p DAYOFWEEK ps !ot in
+  let s = points_within_feat 0.5 p DAYOFWEEK ps in
   let ss_num = float_of_int (num_of_class s cat) in
   let dayOfWeek_p = ss_num /. t_num in
 
-  let s = points_within_feat 0.005 p X ps !ot in
+  let s = points_within_feat 0.005 p X ps in
   let ss_num = float_of_int (num_of_class s cat) in
   let x_p = ss_num /. t_num in
 
-  let s = points_within_feat 0.005 p Y ps !ot in
-  (*let _ = (print_endline(cat_to_string(cat)^", "^string_of_float(t_num))) in
-  let _ = print_endline(string_of_int(num_of_class s LOITER)) in*)
+  let s = points_within_feat 0.005 p Y ps in
   let ss_num = float_of_int (num_of_class s cat) in
   let y_p = ss_num /. t_num in
 
   let out = date_p *. ofDay_p *. dayOfWeek_p *. x_p *. y_p in
-  (*(print_endline(cat_to_string(cat)^", "^string_of_float(out)));*)out
+  out
 
 
 (**
@@ -78,9 +85,9 @@ let i = ref 1
  * It returns the predicted category.
  *)
 let classify p ps =
-  let _ = 
-    if !i mod 1000 = 0 
-    then Printf.printf "Bayes has classified %d data points...\n" !i 
+  let _ =
+    if !i mod 1000 = 0
+    then Printf.printf "Bayes has classified %d data points...\n" !i
     else () in
   let _ = incr i in
   let c = ref UNDETERMINED in
@@ -102,7 +109,8 @@ let classify p ps =
 let predict d ps =
   let p = create_point d false in
   let c_pred = classify p ps in
-  ((classification p), c_pred)
+  let out = ((classification p), c_pred) in
+  out
 
 (**
  * [bayes_predict_all dl ps] tbd
@@ -113,8 +121,6 @@ let bayes_predict_all dl ps =
 
   let testing_points = create_points dl false in
   let ps = ps@testing_points in
-
-  let _ = ot := Point.optimize_test ps in
 
   let rec loop dl out =
     match dl with
