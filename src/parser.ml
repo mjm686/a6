@@ -46,7 +46,6 @@ let classes =
 
 let load_file fname = 
   let ic = Csv.of_channel (open_in fname) in
-  (* To skip over the first line, which is the field names *)
   ic
 
 let parse_cat s = 
@@ -251,30 +250,25 @@ let compare_data d1 d2 =
   String.compare d1 d2
 
 let counter1 = ref 0
-(*let id = ref 0*)
-let parse ic = 
+let parse n ic = 
   let rec helper (acc: data list) : data list =
-    if !counter1 >= 100000 then 
+    if !counter1 >= n then 
       let _ = counter1 := 0 in
       acc
-      (*(List.sort compare_data acc) *)
     else begin
       let next_ic = try (Csv.next ic) with
         | End_of_file -> 
             Csv.close_in ic; 
-            (*let acc = List.sort compare_data acc in*)
             raise (EOF acc);
         | Csv.Failure (n1,n2,s) ->
            (* if any record fails to be in csv format, skip *) 
             printf "failed at field %d line %d because %s\n" n1 n2 s;
             Csv.next ic in
-      (*id := !id + 1;*)
       counter1 := !counter1 + 1;
       let d = next_ic in
       helper ((parse_test_single d)::acc)
     end
   in let data = helper [] in
-  (*List.sort compare_data data*)
   data
 
 let get_next ic acc = 
@@ -289,9 +283,9 @@ let get_next ic acc =
         Csv.next ic
 
 let counter2 = ref 0
-let parse_fold ic = 
+let parse_fold n ic = 
   let rec helper (acc: data list) : data list =
-    if !counter2 >= 100000 then 
+    if !counter2 >= n then 
       let _ = counter2 := 0 in
       (List.sort compare_data acc) 
     else
@@ -329,12 +323,9 @@ let rec format_output outputs =
   end
 
 (* Functions in mli implemented *)
-let parse_test ic = parse ic
+let parse_test ic n = parse n ic
 
-let parse_train ic = 
-  let d = parse_fold ic in
-  let _ = printf "parsed %d records\n" (List.length d) in
-  d
+let parse_train ic n = parse_fold n ic
 
 let write_to fname csv = 
   let csv = format_output csv in
@@ -350,32 +341,4 @@ let data_to_string (d: data) : string list =
   let x = string_of_float d.x in
   let y = string_of_float d.y in
   [id;date;ofDay;category;day;d.pdDistrict;x;y]
-
-(*let example = [(1,[(ARSON, 0.1);(ASSAULT, 0.57123);(BRIBERY, 0.836324)]);(3, [(TREA, 0.8);(WEAPON, 0.3844514);(OTHER, 0.13)])] in
-write_to "test.csv" example*)
-
-(*let ic = load_file "../data/test.csv" in
-let rec example_parse_test acc =
-  let dl = try parse_test ic with
-  | EOF dl -> 
-      let acc = dl@acc in 
-      let _ = raise (EOF acc) in
-      acc in
-  try example_parse_test dl with
-  | EOF dl -> dl in
-example_parse_test []*)
-
-(*let ic = load_file "train_fold1.csv" in
-parse_train ic*)
-
-(*let ic = load_file "train_fold2.csv" in
-let rec example_parse_train acc =
-  let dl = try parse_fold ic with
-  | EOF dl -> 
-      let acc = dl@acc in 
-      let _ = raise (EOF acc) in
-      acc in
-  try example_parse_train dl with
-  | EOF dl -> dl in
-example_parse_train []*)
 

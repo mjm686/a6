@@ -33,14 +33,12 @@ exception EOF of data list
  *)
 val load_file : string -> Csv.in_channel
 
-val cat_to_string : cat -> string
-
 (** [parse_train] parses the csv training data into data records
  *
  *  [parse_train ic] return [data list] where ic is the in_channel
  *  returned by load_file on the intended file to read in
  * *)
-val parse_train : Csv.in_channel -> data list
+val parse_train : Csv.in_channel -> int -> data list
 
 (** [parse_test] parses the csv testing data into data records of which all
  *  data instances' category is Undetermined
@@ -48,7 +46,7 @@ val parse_train : Csv.in_channel -> data list
  *  [parse_test ic] return [data list] where ic is the in_channel returned
  *  by load_file on the intended file to read in
  * *)
-val parse_test : Csv.in_channel ->  data list
+val parse_test : Csv.in_channel -> int ->  data list
 
 (** [write_to] writes properly formatted csv records into a file.
  *

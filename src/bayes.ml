@@ -74,7 +74,10 @@ let i = ref 1
  * It returns the predicted category.
  *)
 let classify p ps =
-  let _ = if !i mod 1000 = 0 then Printf.printf "Bayes %d\n" !i else () in
+  let _ = 
+    if !i mod 1000 = 0 
+    then Printf.printf "Bayes has classified %d data points...\n" !i 
+    else () in
   let _ = incr i in
   let c = ref UNDETERMINED in
   let n = ref 0. in
