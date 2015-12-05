@@ -5,6 +5,7 @@ open ClassifierEval
 open RandomForest
 open Printf
 open ExpGradient
+open Core
 
 type fname = string
 
@@ -24,6 +25,8 @@ let accuracy outputs =
   ((float_of_int (List.length correct)) /. (float_of_int (List.length outputs))) *. 100.0
 
 let main train test output =
+  let _ = printf "##############################################\n" in
+  let start = Time.now () in
   let ic = load_file train in
   let dl = try parse_train ic with
   | EOF d -> d in
@@ -33,7 +36,6 @@ let main train test output =
   let test = try parse_train ic_test with
   | EOF d -> d in
   let _ = printf "Finished parsing testing\n" in
-
 
   let point_training = kNN_train dl in
   let _ = printf "KNN Traning Done...Starting classifying...\n" in
@@ -47,14 +49,16 @@ let main train test output =
   let _ = printf "Ranfom forest done on %d records with %d training\n" (List.length test) (List.length dl) in
   let _ = printf "Random forest accuracy: %f%% \n" (accuracy rf) in
   let _ = printf "kNN accuracy: %f%% \n" (accuracy kNN_results) in
-  let weights = eval rf kNN_results [] in
+  let bayes = bayes_predict_all test (point_training) in
+  let _ = printf "***Bayes done***\n" in
+  let _ = printf "Bayes accuracy: %f%% \n" (accuracy bayes) in
+  let weights = eval rf kNN_results bayes in
   let _ = print_weights weights in
-  (*let bayes = bayes_predict_all test (point_training) in
-  let _ = printf "Bayes done\n" in
-  (*let _ = print_outputs bayes in*)
-  let _ = printf "%d Bayes results\n" (List.length bayes) in*)
-
-    (*
+  let endTime = Time.now () in
+  let _ = printf "####################################################\n" in
+  let _ = print_endline (Time.Span.to_string (Time.diff endTime start)) in
+  
+  (*
    * let rf_result = rf_classify test (rf_train d) in
    * write_output output (results) weights;)
    * *)

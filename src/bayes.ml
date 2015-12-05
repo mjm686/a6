@@ -78,7 +78,7 @@ let i = ref 1
  * It returns the predicted category.
  *)
 let classify p ps =
-  let _ = print_endline(string_of_int(!i)) in
+  let _ = if !i mod 1000 = 0 then Printf.printf "Bayes %d\n" !i else () in
   let _ = incr i in
   let c = ref UNDETERMINED in
   let n = ref 0. in
@@ -99,7 +99,6 @@ let classify p ps =
 let predict d ps =
   let p = create_point d false in
   let c_pred = classify p ps in
-  let _ = print_endline (cat_to_string(classification p)^","^cat_to_string(c_pred)) in
   ((classification p), c_pred)
 
 (**
@@ -117,7 +116,6 @@ let bayes_predict_all dl ps =
   let rec loop dl out =
     match dl with
       | h::t -> let id = h.id in
-                let _ = Printf.printf "%d\n" id in
                 loop t ((id, (predict h ps))::out)
       | [] -> out in
   loop dl []
