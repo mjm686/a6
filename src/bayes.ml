@@ -35,26 +35,30 @@ let likelihood p ps cat =
   let t_num = float_of_int (List.assoc cat (!points_cat_tally)) in
 
   let s = points_within_feat 5. p DATE ps !ot in
-  let s_num = float_of_int (List.length s) in
-  let date_p = s_num /. t_num in
+  let ss_num = float_of_int (num_of_class s cat) in
+  let date_p = ss_num /. t_num in
 
   let s = points_within_feat 30. p OFDAY ps !ot in
-  let s_num = float_of_int (List.length s) in
-  let ofDay_p = s_num /. t_num in
+  let ss_num = float_of_int (num_of_class s cat) in
+  let ofDay_p = ss_num /. t_num in
 
   let s = points_within_feat 0.5 p DAYOFWEEK ps !ot in
-  let s_num = float_of_int (List.length s) in
-  let dayOfWeek_p = s_num /. t_num in
+  let ss_num = float_of_int (num_of_class s cat) in
+  let dayOfWeek_p = ss_num /. t_num in
 
   let s = points_within_feat 0.005 p X ps !ot in
-  let s_num = float_of_int (List.length s) in
-  let x_p = s_num /. t_num in
+  let ss_num = float_of_int (num_of_class s cat) in
+  let x_p = ss_num /. t_num in
 
   let s = points_within_feat 0.005 p Y ps !ot in
-  let s_num = float_of_int (List.length s) in
-  let y_p = s_num /. t_num in
+  (*let _ = (print_endline(cat_to_string(cat)^", "^string_of_float(t_num))) in
+  let _ = print_endline(string_of_int(num_of_class s LOITER)) in*)
+  let ss_num = float_of_int (num_of_class s cat) in
+  let y_p = ss_num /. t_num in
 
-  date_p *. ofDay_p *. dayOfWeek_p *. x_p *. y_p
+  let out = date_p *. ofDay_p *. dayOfWeek_p *. x_p *. y_p in
+  (*(print_endline(cat_to_string(cat)^", "^string_of_float(out)));*)out
+
 
 (**
  * [posterior_probability p ps cat] returns the posterior probability of
@@ -79,7 +83,7 @@ let classify p ps =
   let c = ref UNDETERMINED in
   let n = ref 0. in
   let _ =
-  (for i = 1 to 38 do
+  (for i = 0 to 38 do
     (let x = get_category i in
     let p = posterior_probability p ps x in
     if p >= !n then ((c := x);(n := p)) else ())
@@ -105,7 +109,7 @@ let bayes_predict_all dl ps =
   let _ = (points_cat_tally := tally_cats ps) in
   let _ = (num_points := List.length ps) in
 
-  let testing_points = create_points dl true in
+  let testing_points = create_points dl false in
   let ps = ps@testing_points in
 
   let _ = ot := Point.optimize_test ps in

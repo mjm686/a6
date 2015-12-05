@@ -89,19 +89,19 @@ let optimize_test ps =
 
 
 let date_distance p1 p2 =
-  p2.datep -. p1.datep
+  abs_float(p2.datep -. p1.datep)
 
 let ofDay_distance p1 p2 =
-  p2.ofDayp -. p1.ofDayp
+  abs_float(p2.ofDayp -. p1.ofDayp)
 
 let dayOfWeek_distance p1 p2 =
   if p1.dayOfWeekp = p2.dayOfWeekp then 0. else 1.
 
 let x_distance p1 p2 =
-  p2.xp -. p1.xp
+  abs_float(p2.xp -. p1.xp)
 
 let y_distance p1 p2 =
-  p2.yp -. p1.yp
+  abs_float(p2.yp -. p1.yp)
 
 (**
  * [distance p1 p2] calculates the Euclidean distance between two points p1
@@ -112,8 +112,8 @@ let distance p1 p2 =
             (((date_distance p1 p2) /. 5.)       ** 2.) +.
             (((ofDay_distance p1 p2) /. 30.)     ** 2.) +.
             (((dayOfWeek_distance p1 p2))        ** 2.) +.
-            (((x_distance p1 p2) /. 0.005)       ** 2.) +.
-            (((y_distance p1 p2)) /. 0.005)      ** 2.
+            (((x_distance p1 p2) /. 0.0005)       ** 2.) +.
+            (((y_distance p1 p2)) /. 0.0005)      ** 2.
           ) in
   d
 
@@ -127,13 +127,13 @@ let points_within k p ps =
   List.filter (fun x -> ((distance p x) <= k) && x.training) ps
 
 let points_within_feat k p feat ps ot =
-  (*match feat with
-  | DATE -> List.filter (fun x -> (date_distance p x) <= k) ps
-  | OFDAY -> List.filter (fun x -> (ofDay_distance p x) <= k) ps
-  | DAYOFWEEK -> List.filter (fun x -> (dayOfWeek_distance p x) <= k) ps
-  | X -> List.filter (fun x -> (x_distance p x) <= k) ps
-  | Y -> List.filter (fun x -> (y_distance p x) <= k) ps*)
-  let find_points_test k p ot_sub f =
+  match feat with
+  | DATE -> List.filter (fun x -> ((date_distance p x) <= k) && x.training = false) ps
+  | OFDAY -> List.filter (fun x -> ((ofDay_distance p x) <= k) && x.training = false) ps
+  | DAYOFWEEK -> List.filter (fun x -> ((dayOfWeek_distance p x) <= k) && x.training = false) ps
+  | X -> List.filter (fun x -> ((x_distance p x) <= k) && x.training = false) ps
+  | Y -> List.filter (fun x -> ((y_distance p x) <= k) && x.training = false) ps
+  (*let find_points_test k p ot_sub f =
     let rec loop p = function
       | h::t -> if p.idp = fst h then t else loop p t
       | [] -> failwith("Error") in
@@ -153,7 +153,7 @@ let points_within_feat k p feat ps ot =
   | (OFDAY, (d,t,w,x,y)) -> find_points_test k p t (fun z -> (ofDay_distance p z) <= k)
   | (DAYOFWEEK, (d,t,w,x,y)) -> find_points_test k p w (fun z -> (dayOfWeek_distance p z) <= k)
   | (X, (d,t,w,x,y)) -> find_points_test k p x (fun z -> (x_distance p z) <= k)
-  | (Y, (d,t,w,x,y)) -> find_points_test k p y (fun z -> (y_distance p z) <= k)
+  | (Y, (d,t,w,x,y)) -> find_points_test k p y (fun z -> (y_distance p z) <= k)*)
 
 (**
  * [classification p] returns the category classification of the given point.
@@ -219,6 +219,7 @@ let get_number cat =
     List.assoc cat l
 
 let tally_cats ps =
+  let ps = List.filter (fun x -> x.training) ps in
   let c_list = List.map (fun x -> classification x) ps in
   let n_list = [(0, ref 0); (1, ref 0); (2, ref 0); (3, ref 0);
                 (4, ref 0); (5, ref 0); (6, ref 0); (7, ref 0);
