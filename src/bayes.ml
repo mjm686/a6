@@ -34,7 +34,7 @@ let prior_probability ps cat =
 let likelihood p ps cat =
   let t_num = float_of_int (List.assoc cat (!points_cat_tally)) in
 
-  let s = points_within_feat 5. p DATE ps !ot in
+  let s = points_within_feat 10. p DATE ps !ot in
   let ss_num = float_of_int (num_of_class s cat) in
   let date_p = ss_num /. t_num in
 
@@ -78,9 +78,9 @@ let i = ref 1
  * It returns the predicted category.
  *)
 let classify p ps =
-  let _ = 
-    if !i mod 1000 = 0 
-    then Printf.printf "Bayes has classified %d data points...\n" !i 
+  let _ =
+    if !i mod 1000 = 0
+    then Printf.printf "Bayes has classified %d data points...\n" !i
     else () in
   let _ = incr i in
   let c = ref UNDETERMINED in
@@ -102,7 +102,8 @@ let classify p ps =
 let predict d ps =
   let p = create_point d false in
   let c_pred = classify p ps in
-  ((classification p), c_pred)
+  let out = ((classification p), c_pred) in
+  out
 
 (**
  * [bayes_predict_all dl ps] tbd

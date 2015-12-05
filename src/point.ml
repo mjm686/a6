@@ -128,11 +128,11 @@ let points_within k p ps =
 
 let points_within_feat k p feat ps ot =
   match feat with
-  | DATE -> List.filter (fun x -> ((date_distance p x) <= k) && x.training = false) ps
-  | OFDAY -> List.filter (fun x -> ((ofDay_distance p x) <= k) && x.training = false) ps
-  | DAYOFWEEK -> List.filter (fun x -> ((dayOfWeek_distance p x) <= k) && x.training = false) ps
-  | X -> List.filter (fun x -> ((x_distance p x) <= k) && x.training = false) ps
-  | Y -> List.filter (fun x -> ((y_distance p x) <= k) && x.training = false) ps
+  | DATE -> List.filter (fun x -> ((date_distance p x) <= k) && x.training) ps
+  | OFDAY -> List.filter (fun x -> ((ofDay_distance p x) <= k) && x.training) ps
+  | DAYOFWEEK -> List.filter (fun x -> ((dayOfWeek_distance p x) <= k) && x.training) ps
+  | X -> List.filter (fun x -> ((x_distance p x) <= k) && x.training) ps
+  | Y -> List.filter (fun x -> ((y_distance p x) <= k) && x.training) ps
   (*let find_points_test k p ot_sub f =
     let rec loop p = function
       | h::t -> if p.idp = fst h then t else loop p t
