@@ -1,4 +1,3 @@
-open Async
 open Csv
 open Printf
 open Core
@@ -48,6 +47,7 @@ let load_file fname =
   let ic = Csv.of_channel (open_in fname) in
   ic
 
+(* Parses a string into a cat variant *)
 let parse_cat s = 
   match s with 
   | "ARSON" -> ARSON
@@ -91,6 +91,7 @@ let parse_cat s =
   | "WEAPON LAWS" -> WEAPON
   | _ -> UNRECOGNIZED
 
+(* Parses a string into a day variant *)
 let parse_day s = 
   match s with
   | "Monday" -> Mon
@@ -102,6 +103,8 @@ let parse_day s =
   | "Sunday" -> Sun
   | _ -> Unknown
 
+(* Returns a string representation of a cat variant, kept consistent with
+ * the original training data *)
 let cat_to_string c = 
   match c with 
   | ARSON -> "ARSON"
@@ -146,6 +149,7 @@ let cat_to_string c =
   | UNRECOGNIZED -> "UNRECOGNIZED"
   | UNDETERMINED -> "UNDETERMINED"
 
+(* Returns a string representation of a day variant *)
 let day_to_string d = 
   match d with
   | Mon -> "Monday"
@@ -157,16 +161,25 @@ let day_to_string d =
   | Sun -> "Sunday"
   | Unknown -> "Unknown"
 
+(* Helper print function for debugging *)
 let print_single d = 
   let open Format in
   let format_helper f d =
     fprintf f "%a %a %s %s %s %f %f\n" Date0.pp d.date Time.Ofday.pp d.ofDay (cat_to_string d.category) (day_to_string d.dayOfWeek) d.pdDistrict d.x d.y in
   printf "Id %d %a" d.id format_helper d
 
+let print_all data = 
+  List.iter print_single data
+
+(* Helper function for parsing strings into floats*)
 let float_helper s = 
   if String.length s < 12 then String.length s
   else 12
 
+(* Helper function that parses one string list into a data record 
+ * Note: this function was used to initially parse through the raw data, and 
+ * that was only needed to be done once, so this function is currently not used
+ * anywhere in the current version of the code.*)
 let parse_single ?test:(test=false) id ls =
   let time = Time.of_string (List.hd ls) in
   let (date, of_day) = Time.to_date_ofday time (Time.Zone.local) in
@@ -195,6 +208,9 @@ let parse_single ?test:(test=false) id ls =
   } in
   d
 
+(* Helper function for parsing the testing data which has less fields than
+ * the training data. All returned data records have the category of 
+ * UNDETERMINED.*)
 let parse_test_single ls =
   let id = int_of_string (List.hd ls) in
   let time = Time.of_string (List.nth ls 1) in
@@ -221,6 +237,7 @@ let parse_test_single ls =
   } in
   d
 
+(* Helper function for parsing in processed data *)
 let parse_fold_single ls =
   let id = int_of_string (List.hd ls) in
   let date = Date0.of_string_iso8601_basic (List.nth ls 1) 0 in
@@ -244,11 +261,43 @@ let parse_fold_single ls =
   } in
   d
 
+(* Helper function to sort data by category *)
 let compare_data d1 d2 =
   let d1 = cat_to_string d1.category in
   let d2 = cat_to_string d2.category in
   String.compare d1 d2
 
+(* Helper function to get the next csv record from file *)
+let get_next ic acc = 
+  try (Csv.next ic) with
+    | End_of_file -> 
+        Csv.close_in ic; 
+        let acc = List.sort compare_data acc in
+        raise (EOF acc);
+    | Csv.Failure (n1,n2,s) ->
+       (* if any record fails to be in csv format, skip *) 
+        printf "failed at field %d line %d because %s\n" n1 n2 s;
+        Csv.next ic
+
+(* Helper function to parse the file in stdin, specifically used for parsing
+ * already processed data file *)
+let counter2 = ref 0
+let parse_fold n ic = 
+  let rec helper (acc: data list) : data list =
+    if !counter2 >= n then 
+      let _ = counter2 := 0 in
+      (List.sort compare_data acc) 
+    else
+      let _ = counter2 := !counter2 + 1 in
+      let d = try get_next ic acc with
+        | EOF acc -> raise (EOF acc) in
+      let d = parse_fold_single d in
+      helper (d::acc) in
+  let data = helper [] in
+  List.sort compare_data data
+
+(* Helper function to parse the file in stdin, specifically used for parsing 
+ * the testing data file *)
 let counter1 = ref 0
 let parse n ic = 
   let rec helper (acc: data list) : data list =
@@ -271,48 +320,27 @@ let parse n ic =
   in let data = helper [] in
   data
 
-let get_next ic acc = 
-  try (Csv.next ic) with
-    | End_of_file -> 
-        Csv.close_in ic; 
-        let acc = List.sort compare_data acc in
-        raise (EOF acc);
-    | Csv.Failure (n1,n2,s) ->
-       (* if any record fails to be in csv format, skip *) 
-        printf "failed at field %d line %d because %s\n" n1 n2 s;
-        Csv.next ic
+(* Helper function for if multiple algorithms predict the same category, the 
+ * probability is the sum of all of their weights *)
+let get_prob c ls =
+  List.fold_left (fun acc i -> 
+    if c = (fst i) then acc +. (snd i) else acc) 0.0 ls
 
-let counter2 = ref 0
-let parse_fold n ic = 
-  let rec helper (acc: data list) : data list =
-    if !counter2 >= n then 
-      let _ = counter2 := 0 in
-      (List.sort compare_data acc) 
-    else
-      let _ = counter2 := !counter2 + 1 in
-      let d = try get_next ic acc with
-        | EOF acc -> raise (EOF acc) in
-      let d = parse_fold_single d in
-      helper (d::acc) in
-  let data = helper [] in
-  List.sort compare_data data
-
-let print_all data = 
-  List.iter print_single data
-
-(* ls is an associative list of class and prob (float) *)
+(* Formats the predictions into a valid csv record that has a probability for 
+ * each category possible.
+ *
+ * [ls] is an associative list of cat and probability (float) *)
 let rec format_output_helper classes ls = 
   match classes with
   | [] -> []
   | h::t ->
-      let p = try List.assoc h ls with
-      | Not_found -> 0.0 in
+      let p = get_prob h ls in
       let p = 
         if p = 0.0 then string_of_int (int_of_float p) 
         else string_of_float p in
       p::(format_output_helper t ls)  
 
-(* formats an output list into string list list *)
+(* Formats an output list into string list list *)
 let rec format_output outputs = 
   match outputs with
   | [] -> []
@@ -322,13 +350,21 @@ let rec format_output outputs =
     (id::tl)::(format_output t)
   end
 
-(* Functions in mli implemented *)
+(* Implementations of most functions in .mli *)
 let parse_test ic n = parse n ic
 
 let parse_train ic n = parse_fold n ic
 
 let write_to fname csv =
-  let header = ["id";"ARSON";"ASSAULT";"BAD CHECKS";"BRIBERY";"BURGLARY";"DISORDERLY CONDUCT";"DRIVING UNDER THE INFLUENCE";"DRUG/NARCOTIC";"DRUNKENNESS";"EMBEZZLEMENT";"EXTORTION";"FAMILY OFFENSES";"FORGERY/COUNTERFEITING";"FRAUD";"GAMBLING";"KIDNAPPING";"LARCENY/THEFT";"LIQUOR LAWS";"LOITERING";"MISSING PERSON";"NON-CRIMINAL";"OTHER OFFENSES";"PORNOGRAPHY/OBSCENE MAT";"PROSTITUTION";"RECOVERED VEHICLE";"ROBBERY";"RUNAWAY";"SECONDARY CODES";"SEX OFFENSES FORCIBLE";"SEX OFFENSES NON FORCIBLE";"STOLEN PROPERTY";"SUICIDE";"SUSPICIOUS OCC";"TREA";"TRESPASS";"VANDALISM";"VEHICLE THEFT";"WARRANTS";"WEAPON LAWS"] in
+  let header = ["id";"ARSON";"ASSAULT";"BAD CHECKS";"BRIBERY";"BURGLARY";
+  "DISORDERLY CONDUCT";"DRIVING UNDER THE INFLUENCE";"DRUG/NARCOTIC";
+  "DRUNKENNESS";"EMBEZZLEMENT";"EXTORTION";"FAMILY OFFENSES";
+  "FORGERY/COUNTERFEITING";"FRAUD";"GAMBLING";"KIDNAPPING";"LARCENY/THEFT";
+  "LIQUOR LAWS";"LOITERING";"MISSING PERSON";"NON-CRIMINAL";"OTHER OFFENSES";
+  "PORNOGRAPHY/OBSCENE MAT";"PROSTITUTION";"RECOVERED VEHICLE";"ROBBERY";
+  "RUNAWAY";"SECONDARY CODES";"SEX OFFENSES FORCIBLE";
+  "SEX OFFENSES NON FORCIBLE";"STOLEN PROPERTY";"SUICIDE";"SUSPICIOUS OCC";
+  "TREA";"TRESPASS";"VANDALISM";"VEHICLE THEFT";"WARRANTS";"WEAPON LAWS"] in
   let csv = format_output csv in
   let csv = header::csv in
   let oc = Csv.to_channel (open_out fname) in

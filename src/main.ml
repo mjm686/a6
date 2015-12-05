@@ -132,5 +132,5 @@ let main n ftrain ftest eval_train eval_test output =
   write_to output results
 
 (* The function call that runs the project *)
-(* let () = main 100000 "../data/train.csv" "../data/test.csv" "../data/train_1.csv" "../data/test_1.csv" "output.csv"*)
-let () = main 1000 "../data/sample_train.csv" "../data/sample_test.csv" "../data/train_1.csv" "../data/test_1.csv" ".../data/sample_output.csv"
+let () = main 10000 "../data/train.csv" "../data/test.csv" "../data/train_1.csv" "../data/test_1.csv" "../data/output.csv"
+(*let () = main 1000 "../data/train.csv" "../data/test.csv" "../data/train_1.csv" "../data/test_1.csv" "../data/test_output.csv"*)

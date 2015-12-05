@@ -1,12 +1,10 @@
-open ExpGradient
 open Parser
-open CrossValid
+open ExpGradient
 
-(** [eval] runs 4-fold cross validation with the EG algorithm to give weights
- *  to all three algorithms based on their performances, and then each 
- *  algorithm would receive the average weight of the four weights
+(** [eval] runs the EG algorithm to give weights
+ *  to all three algorithms based on their performances
  *
- *  [eval d] takes the parsed traning data and returns a set of weights for
- *  outputting the final predictions for the testing data
- * *)
+ *  [eval e1 e2 e3] takes in the outputs from all three algorithms on the 
+ *  evaluation set of data and returns a set of weights
+ *  *)
 val eval : eval_out -> eval_out -> eval_out -> weights

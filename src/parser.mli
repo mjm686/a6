@@ -1,6 +1,7 @@
 open Core
 open Csv
 
+(* Types are exposed in .mli for other modules' implementations *)
 type cat = 
    | ARSON | ASSAULT | BADCHECKS | BRIBERY | BURGLARY | DISORDERLY 
    | DRIVING | DRUG | DRUNK | EMBEZZLE
@@ -36,16 +37,18 @@ val load_file : string -> Csv.in_channel
 
 (** [parse_train] parses the csv training data into data records
  *
- *  [parse_train ic] return [data list] where ic is the in_channel
- *  returned by load_file on the intended file to read in
+ *  [parse_train ic n] return [data list] that's at most [n]-element long 
+ *  where ic is the in_channel returned by load_file on the intended file to 
+ *  read in
  * *)
 val parse_train : Csv.in_channel -> int -> data list
 
 (** [parse_test] parses the csv testing data into data records of which all
  *  data instances' category is Undetermined
  *
- *  [parse_test ic] return [data list] where ic is the in_channel returned
- *  by load_file on the intended file to read in
+ *  [parse_test ic n] return [data list] that's at most [n]-element long
+ *  where ic is the in_channel returned by load_file on the intended file to 
+ *  read in
  * *)
 val parse_test : Csv.in_channel -> int ->  data list
 
@@ -55,6 +58,8 @@ val parse_test : Csv.in_channel -> int ->  data list
  *)
 val write_to: string -> output list -> unit
 
+(* [data_to_string] returns a string list representation of a data record *)
 val data_to_string : data -> string list
 
+(* [cat_to_string] returns a string representation of a category *)
 val cat_to_string: cat -> string
