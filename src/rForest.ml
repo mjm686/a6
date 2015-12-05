@@ -74,7 +74,7 @@ let timeList =
 
 let dayList =
   [Mon; Tue; Wed; Thur;
-  Fri; Sat; Sun; Unknown]
+  Fri; Sat; Sun]
 
 let rec makeLeaves (l : cat list) : tree list =
   match l with
