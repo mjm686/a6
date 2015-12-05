@@ -13,6 +13,8 @@ type cat =
  | SEXOFFENSESF | SEXOFFENSESNF | STOLEN
  | SUICIDE | SUSPICIOUS | TREA | TRESPASS | VANDALISM | VEHICLE 
  | WARRANTS | WEAPON | UNDETERMINED | UNRECOGNIZED
+type algo = | KNN | RF | Bayes
+type day = | Mon | Tue | Wed | Thur | Fri | Sat | Sun | Unknown
 
 type data = {
   id: int;
@@ -23,9 +25,9 @@ type data = {
   pdDistrict: string;
   x: float;
   y: float 
-} and day = | Mon | Tue | Wed | Thur | Fri | Sat | Sun | Unknown
-
+} 
 type output = int * (cat*float) list
+type eval_out = (int * (cat*cat)) list
 
 exception BadData
 exception EOF of data list
@@ -218,7 +220,6 @@ let parse_test_single ls =
     x = x;
     y = y 
   } in
-  let _ = printf "%d\n" d.id in
   d
 
 let parse_fold_single ls =
@@ -290,7 +291,7 @@ let get_next ic acc =
 let counter2 = ref 0
 let parse_fold ic = 
   let rec helper (acc: data list) : data list =
-    if !counter2 >= 100000 then 
+    if !counter2 >= 10000 then 
       let _ = counter2 := 0 in
       (List.sort compare_data acc) 
     else
