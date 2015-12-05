@@ -19,7 +19,7 @@ let i = ref 1
 let classify p ps =
   
   let _ = 
-    if (!i mod 1000) = 0 then print_endline(string_of_int(!i))
+    if (!i mod 1000) = 0 then print_endline ("kNN"^(string_of_int(!i)))
     else () in
   let _ = incr i in
   let ps_sub = points_within 5. p ps in
