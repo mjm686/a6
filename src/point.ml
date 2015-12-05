@@ -16,21 +16,20 @@ type point = {
   training : bool
 }
 
-type opt_test = (((int * (point ref)) list) * ((int * (point ref)) list)) *
-                (((int * (point ref)) list) * ((int * (point ref)) list)) *
-                (((int * (point ref)) list) * ((int * (point ref)) list)) *
-                (((int * (point ref)) list) * ((int * (point ref)) list)) *
-                (((int * (point ref)) list) * ((int * (point ref)) list))
 (**
  * Represents an entire collection of data points, forming the whole graph.
  *)
 type points = point list
 
+(**
+ * Represents the features used to predict a point's classification.
+ *)
 type features = DATE | OFDAY | DAYOFWEEK | X | Y
 
 (**
- * [create_point d] creates an individual 6-dimensional point from the given
- *  data.
+ * [create_point d] creates an individual many-dimensional point from the given
+ *  data,with flag t indicating whether the point should be considered a
+ * training point.
  *)
 let create_point d t =
   let dt = d.date in
@@ -52,41 +51,13 @@ let create_point d t =
    training = t
   }
 
-
 (**
- * [create_points d t] creates a collection of points from the given data list d.
+ * [create_points d t] creates a collection of points from the given data list
+ * d, with flag t indicating whether the points should be considered training
+ * points.
  *)
 let create_points d t =
   List.map (fun x -> create_point x t) d
-
-let optimize_test ps =
-  let ps = List.sort (fun x y -> if x.datep > y.datep then (1) else (-1)) ps in
-  let d1 = List.map (fun x -> (x.idp, ref x)) ps in
-  let d2  = List.rev d1 in
-  let d = (d1, d2) in
-
-  let ps = List.sort (fun x y -> if x.ofDayp > y.ofDayp then (1) else (-1)) ps in
-  let t1 = List.map (fun x -> (x.idp, ref x)) ps in
-  let t2  = List.rev d1 in
-  let t = (t1, t2) in
-
-  let ps = List.sort (fun x y -> if x.dayOfWeekp > y.dayOfWeekp then (1) else (-1)) ps in
-  let w1 = List.map (fun x -> (x.idp, ref x)) ps in
-  let w2  = List.rev d1 in
-  let w = (w1, w2) in
-
-  let ps = List.sort (fun x y -> if x.xp > y.xp then (1) else (-1)) ps in
-  let x1 = List.map (fun x -> (x.idp, ref x)) ps in
-  let x2  = List.rev d1 in
-  let x = (x1, x2) in
-
-  let ps = List.sort (fun x y -> if x.yp > y.yp then (1) else (-1)) ps in
-  let y1 = List.map (fun x -> (x.idp, ref x)) ps in
-  let y2  = List.rev d1 in
-  let y = (y1, y2) in
-
-  (d,t,w,x,y)
-
 
 let date_distance p1 p2 =
   abs_float(p2.datep -. p1.datep)
@@ -126,40 +97,30 @@ let distance p1 p2 =
 let points_within k p ps =
   List.filter (fun x -> ((distance p x) <= k) && x.training) ps
 
-let points_within_feat k p feat ps ot =
+(**
+ * [points_within k p feat ps] returns a list of points within the given
+ * distance, measured only the dimension of feature feat.
+ *
+ * For point p within a field of points ps, returns a list of points that fall
+ * within the given distance.
+ *)
+let points_within_feat k p feat ps =
   match feat with
   | DATE -> List.filter (fun x -> ((date_distance p x) <= k) && x.training) ps
   | OFDAY -> List.filter (fun x -> ((ofDay_distance p x) <= k) && x.training) ps
   | DAYOFWEEK -> List.filter (fun x -> ((dayOfWeek_distance p x) <= k) && x.training) ps
   | X -> List.filter (fun x -> ((x_distance p x) <= k) && x.training) ps
   | Y -> List.filter (fun x -> ((y_distance p x) <= k) && x.training) ps
-  (*let find_points_test k p ot_sub f =
-    let rec loop p = function
-      | h::t -> if p.idp = fst h then t else loop p t
-      | [] -> failwith("Error") in
-    let l1 = loop p (fst ot_sub) in
-    let l2 = loop p (snd ot_sub) in
-    let rec loop out = function
-      | h::t -> if (!(snd h)).training = false then loop out t
-                else (if (f !(snd h)) then loop (!(snd h)::out) t else out)
-      | [] -> out in
-    let ps1 = loop [] l1 in
-    let ps2 = loop [] l2 in
-    let ps = ps1@ps2 in
-    ps in
-
-  match (feat, ot) with
-  | (DATE, (d,t,w,x,y)) -> find_points_test k p d (fun z -> (date_distance p z) <= k)
-  | (OFDAY, (d,t,w,x,y)) -> find_points_test k p t (fun z -> (ofDay_distance p z) <= k)
-  | (DAYOFWEEK, (d,t,w,x,y)) -> find_points_test k p w (fun z -> (dayOfWeek_distance p z) <= k)
-  | (X, (d,t,w,x,y)) -> find_points_test k p x (fun z -> (x_distance p z) <= k)
-  | (Y, (d,t,w,x,y)) -> find_points_test k p y (fun z -> (y_distance p z) <= k)*)
 
 (**
  * [classification p] returns the category classification of the given point.
  *)
 let classification p = p.categoryp
 
+(**
+ * [get_castegory i] returns the category classification assigned to the given
+ * number.
+ *)
 let get_category = function
   | 0 -> ARSON
   | 1 -> ASSAULT
@@ -202,6 +163,10 @@ let get_category = function
   | 38 -> WEAPON
   | _ -> failwith("Error")
 
+(**
+ * [get_number cat] returns the number assigned to the given category
+ * classification
+ *)
 let get_number cat =
     let l = [(ARSON, 0); (ASSAULT, 1); (BADCHECKS, 2);
             (BRIBERY, 3); (BURGLARY, 4); (DISORDERLY, 5);
@@ -218,6 +183,12 @@ let get_number cat =
             (WARRANTS, 37); (WEAPON, 38)] in
     List.assoc cat l
 
+(**
+ * [tally_cats ps] returns a list of tuples, one for each category, with
+ * the first component of each tuple being the category, and the second
+ * component being the number of training points of that cateogry in the points
+ * ps.
+ *)
 let tally_cats ps =
   let ps = List.filter (fun x -> x.training) ps in
   let c_list = List.map (fun x -> classification x) ps in
@@ -238,12 +209,6 @@ let tally_cats ps =
       | [] -> n_list in
   let out = loop c_list n_list in
   List.map (fun x -> (get_category(fst x), !(snd x))) out
-
-let print_temp x =
-  match x with
-  | h::t -> (string_of_int (fst h))^"  "^(cat_to_string(fst (snd h)))^", "^
-            (cat_to_string(snd (snd h)))
-  | [] -> ""
 
 (**
  * [num_of_class ps cat] returns the number of points of the given category

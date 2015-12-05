@@ -4,8 +4,6 @@ open Point
 let points_cat_tally = ref (tally_cats ([]))
 let num_points = ref 0
 
-let ot = ref (([],[]),([],[]),([],[]),([],[]),([],[]))
-
 (**
  * [bayes_train l] takes in training data and outputs the collection of points that
  * result.
@@ -34,23 +32,23 @@ let prior_probability ps cat =
 let likelihood p ps cat =
   let t_num = float_of_int (List.assoc cat (!points_cat_tally)) in
 
-  let s = points_within_feat 10. p DATE ps !ot in
+  let s = points_within_feat 10. p DATE ps in
   let ss_num = float_of_int (num_of_class s cat) in
   let date_p = ss_num /. t_num in
 
-  let s = points_within_feat 30. p OFDAY ps !ot in
+  let s = points_within_feat 30. p OFDAY ps in
   let ss_num = float_of_int (num_of_class s cat) in
   let ofDay_p = ss_num /. t_num in
 
-  let s = points_within_feat 0.5 p DAYOFWEEK ps !ot in
+  let s = points_within_feat 0.5 p DAYOFWEEK ps in
   let ss_num = float_of_int (num_of_class s cat) in
   let dayOfWeek_p = ss_num /. t_num in
 
-  let s = points_within_feat 0.005 p X ps !ot in
+  let s = points_within_feat 0.005 p X ps in
   let ss_num = float_of_int (num_of_class s cat) in
   let x_p = ss_num /. t_num in
 
-  let s = points_within_feat 0.005 p Y ps !ot in
+  let s = points_within_feat 0.005 p Y ps in
   (*let _ = (print_endline(cat_to_string(cat)^", "^string_of_float(t_num))) in
   let _ = print_endline(string_of_int(num_of_class s LOITER)) in*)
   let ss_num = float_of_int (num_of_class s cat) in
@@ -114,8 +112,6 @@ let bayes_predict_all dl ps =
 
   let testing_points = create_points dl false in
   let ps = ps@testing_points in
-
-  let _ = ot := Point.optimize_test ps in
 
   let rec loop dl out =
     match dl with
