@@ -55,13 +55,13 @@ let exp_eval (rf:eval_out) (knn:eval_out) (bayes:eval_out) : weights =
   let weights = init () in
     let _ = List.iter (fun i ->
       let cats = snd i in
-      adjust (RF,cats) weights 0.0013) rf in
+      adjust (RF,cats) weights 0.0011) rf in
     let _ = List.iter (fun i ->
       let cats = snd i in
-      adjust (KNN,cats) weights 0.0013) knn in
+      adjust (KNN,cats) weights 0.0011) knn in
     let _ = List.iter (fun i ->
       let cats = snd i in
-      adjust (Bayes,cats) weights 0.0013) bayes in
+      adjust (Bayes,cats) weights 0.0011) bayes in
     weights
 
 let print_weights (w: weights) : unit = 
